@@ -22,4 +22,4 @@ Thumbs.db
 *.log
 
 # unneeded modules files
-*.node_modules/
+node_modules/
