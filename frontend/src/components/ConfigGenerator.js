@@ -120,8 +120,8 @@ const ConfigGenerator = ({ onClose, onConfigCreated }) => {
     }
   };
 
-  const generateConfig = async () => {
-    const config = {
+  const buildConfig = () => {
+    return {
       race: {
         name: raceName,
         name_jp: raceName,
@@ -145,6 +145,24 @@ const ConfigGenerator = ({ onClose, onConfigCreated }) => {
         skills: u.skills
       }))
     };
+  };
+
+  const saveConfigAsJSON = () => {
+    const config = buildConfig();
+    const jsonString = JSON.stringify(config, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${raceName.replace(/\s+/g, '_')}_config.json`;
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+  };
+
+  const generateConfig = async () => {
+    const config = buildConfig();
 
     try {
       // Create FormData to upload as file
@@ -587,6 +605,14 @@ const ConfigGenerator = ({ onClose, onConfigCreated }) => {
 
         {/* Footer Buttons */}
         <div className="flex gap-3">
+          <motion.button
+            onClick={saveConfigAsJSON}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-lg"
+          >
+            ↓ Save as JSON
+          </motion.button>
           <motion.button
             onClick={generateConfig}
             whileHover={{ scale: 1.05 }}
