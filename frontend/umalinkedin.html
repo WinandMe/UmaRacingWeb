@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UmalinkedIn - Professional Network for Racing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1.5rem;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 0.8rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn-search:hover {
+            background: #5568d3;
+        }
+
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border: 3px solid white;
+        }
+
+        .profile-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-role {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+        }
+
+        .profile-body {
+            padding: 1.5rem;
+        }
+
+        .headline {
+            font-size: 0.95rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .bio {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .profile-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .info-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 0.7rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .btn-scout {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-scout:hover {
+            background: #5568d3;
+        }
+
+        .btn-view {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-view:hover {
+            background: #d0d0d0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 1rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #999;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .requests-list {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .request-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-item:last-child {
+            border-bottom: none;
+        }
+
+        .request-info {
+            flex: 1;
+        }
+
+        .request-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        .request-type {
+            font-size: 0.85rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .request-message {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .request-status {
+            background: #f0f0f0;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #667eea;
+            margin-right: 1rem;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn-accept {
+            padding: 0.6rem 1.2rem;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .btn-accept:hover {
+            background: #45a049;
+        }
+
+        .btn-reject {
+            padding: 0.6rem 1.2rem;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .btn-reject:hover {
+            background: #da190b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .profiles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar">
+        <h1>🔗 UmalinkedIn</h1>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="location.href='/main-menu.html'">Main Menu</button>
+            <button class="btn btn-secondary" onclick="loadPage('profile')">My Profile</button>
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('browse')">Browse Profiles</button>
+            <button class="tab-btn" onclick="switchTab('requests')">Requests (<span id="pending-count">0</span>)</button>
+            <button class="tab-btn" onclick="switchTab('sent')">Sent Requests</button>
+        </div>
+
+        <!-- Browse Tab -->
+        <div id="browse" class="tab-content active">
+            <div class="main-content">
+                <div class="sidebar">
+                    <h3>Filters</h3>
+                    <div class="filter-group">
+                        <label>Looking For:</label>
+                        <select id="filterLookingFor" onchange="browseProfiles()">
+                            <option value="">All</option>
+                            <option value="trainer">Trainers</option>
+                            <option value="trainee">Trainees</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Experience Level:</label>
+                        <select id="filterLevel" onchange="browseProfiles()">
+                            <option value="">All Levels</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="professional">Professional</option>
+                        </select>
+                    </div>
+                    <button class="btn-search" onclick="browseProfiles()">Search</button>
+                </div>
+
+                <div>
+                    <div id="profiles-container" class="profiles-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requests Tab -->
+        <div id="requests" class="tab-content">
+            <div id="received-container" class="requests-list"></div>
+        </div>
+
+        <!-- Sent Requests Tab -->
+        <div id="sent" class="tab-content">
+            <div id="sent-container" class="requests-list"></div>
+        </div>
+    </div>
+
+    <!-- Scout Modal -->
+    <div id="scoutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Send Scout Request</div>
+            <div id="alert-container"></div>
+            <form onsubmit="submitScoutRequest(event)">
+                <div class="form-group">
+                    <label>Target: <strong id="target-name"></strong></label>
+                </div>
+                <div class="form-group">
+                    <label>Request Type:</label>
+                    <select id="requestType" required>
+                        <option value="">Select...</option>
+                        <option value="recruit_trainer">Recruit as Trainer</option>
+                        <option value="recruit_trainee">Recruit as Trainee</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea id="scoutMessage" placeholder="Tell them why you'd like to work together..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeScoutModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:5000/api";
+        let currentUser = null;
+        let selectedProfileUserId = null;
+
+        // ===== INITIALIZATION =====
+        async function init() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Not authenticated');
+                currentUser = await response.json();
+                
+                // Ensure user has a profile
+                await ensureProfile();
+                
+                // Load initial data
+                await browseProfiles();
+                await loadRequests();
+                
+            } catch (error) {
+                console.error('Init error:', error);
+                localStorage.removeItem('token');
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function ensureProfile() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/profile/${currentUser.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok && response.status === 404) {
+                    // Create default profile
+                    const defaultRole = currentUser.role === 'trainer' ? 'trainee' : 'trainer';
+                    await fetch(`${API_BASE}/umalinkedin/profile`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            headline: `Experienced ${currentUser.role}`,
+                            bio: `I'm looking for amazing ${defaultRole}s to collaborate with!`,
+                            looking_for: defaultRole,
+                            experience_level: 'intermediate',
+                            visibility: 'public'
+                        })
+                    });
+                }
+            } catch (error) {
+                console.error('Error ensuring profile:', error);
+            }
+        }
+
+        // ===== BROWSE PROFILES =====
+        async function browseProfiles() {
+            try {
+                const token = localStorage.getItem('token');
+                const lookingFor = document.getElementById('filterLookingFor').value;
+                const level = document.getElementById('filterLevel').value;
+
+                let url = `${API_BASE}/umalinkedin/browse`;
+                const params = new URLSearchParams();
+                if (lookingFor) params.append('looking_for', lookingFor);
+                if (level) params.append('experience_level', level);
+
+                const response = await fetch(`${url}?${params}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch profiles');
+                const profiles = await response.json();
+
+                displayProfiles(profiles);
+            } catch (error) {
+                console.error('Browse error:', error);
+                document.getElementById('profiles-container').innerHTML = '<div class="alert alert-error">Error loading profiles</div>';
+            }
+        }
+
+        function displayProfiles(profiles) {
+            const container = document.getElementById('profiles-container');
+            
+            if (profiles.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🔍</div>
+                        <div>No profiles found matching your filters.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = profiles.map(profile => `
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">${getInitials(profile.username)}</div>
+                        <div class="profile-name">${profile.username}</div>
+                        <div class="profile-role">${profile.role}</div>
+                    </div>
+                    <div class="profile-body">
+                        <div class="headline">${profile.headline || 'No headline'}</div>
+                        <div class="bio">${profile.bio || 'No bio'}</div>
+                        <div class="profile-info">
+                            <div class="info-item">
+                                <div class="info-label">Looking For</div>
+                                <div class="info-value">${profile.looking_for}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Level</div>
+                                <div class="info-value">${profile.experience_level || 'N/A'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Profile Views</div>
+                                <div class="info-value">${profile.views_count}</div>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn-action btn-scout" onclick="openScoutModal(${profile.user_id}, '${profile.username}')">
+                                Send Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== SCOUT REQUESTS =====
+        function openScoutModal(userId, username) {
+            selectedProfileUserId = userId;
+            document.getElementById('target-name').textContent = username;
+            document.getElementById('scoutModal').classList.add('show');
+        }
+
+        function closeScoutModal() {
+            document.getElementById('scoutModal').classList.remove('show');
+            selectedProfileUserId = null;
+            document.getElementById('requestType').value = '';
+            document.getElementById('scoutMessage').value = '';
+            document.getElementById('alert-container').innerHTML = '';
+        }
+
+        async function submitScoutRequest(event) {
+            event.preventDefault();
+
+            try {
+                const token = localStorage.getItem('token');
+                const requestType = document.getElementById('requestType').value;
+                const message = document.getElementById('scoutMessage').value;
+
+                const response = await fetch(`${API_BASE}/umalinkedin/scout-request`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        target_user_id: selectedProfileUserId,
+                        request_type: requestType,
+                        message: message || null
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to send request');
+                }
+
+                document.getElementById('alert-container').innerHTML = 
+                    '<div class="alert alert-success">Request sent successfully!</div>';
+                
+                setTimeout(() => {
+                    closeScoutModal();
+                    browseProfiles();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Scout request error:', error);
+                document.getElementById('alert-container').innerHTML = 
+                    `<div class="alert alert-error">${error.message}</div>`;
+            }
+        }
+
+        // ===== LOAD REQUESTS =====
+        async function loadRequests() {
+            try {
+                const token = localStorage.getItem('token');
+
+                const response = await fetch(`${API_BASE}/umalinkedin/scout-requests/received?status=pending`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load requests');
+                const requests = await response.json();
+
+                document.getElementById('pending-count').textContent = requests.length;
+                displayReceivedRequests(requests);
+
+                // Load sent requests too
+                const sentResponse = await fetch(`${API_BASE}/umalinkedin/scout-requests/sent`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (sentResponse.ok) {
+                    const sentRequests = await sentResponse.json();
+                    displaySentRequests(sentRequests);
+                }
+
+            } catch (error) {
+                console.error('Load requests error:', error);
+            }
+        }
+
+        function displayReceivedRequests(requests) {
+            const container = document.getElementById('received-container');
+
+            if (requests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📬</div>
+                        <div>No pending requests</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = requests.map(req => `
+                <div class="request-item">
+                    <div class="request-info">
+                        <div class="request-name">${req.requester_username}</div>
+                        <div class="request-type">${formatRequestType(req.request_type)}</div>
+                        ${req.message ? `<div class="request-message">"${req.message}"</div>` : ''}
+                    </div>
+                    <div class="request-status">${req.status}</div>
+                    <div class="request-actions">
+                        <button class="btn-accept" onclick="acceptRequest(${req.id})">Accept</button>
+                        <button class="btn-reject" onclick="rejectRequest(${req.id})">Reject</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displaySentRequests(requests) {
+            const container = document.getElementById('sent-container');
+
+            if (requests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📤</div>
+                        <div>You haven't sent any requests yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = requests.map(req => `
+                <div class="request-item">
+                    <div class="request-info">
+                        <div class="request-name">${req.target_username}</div>
+                        <div class="request-type">${formatRequestType(req.request_type)}</div>
+                        ${req.message ? `<div class="request-message">"${req.message}"</div>` : ''}
+                    </div>
+                    <div class="request-status">${req.status}</div>
+                    ${req.status === 'pending' ? `
+                        <div class="request-actions">
+                            <button class="btn-reject" onclick="cancelRequest(${req.id})">Cancel</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function acceptRequest(requestId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/scout-requests/${requestId}/accept`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to accept request');
+                
+                showNotification('Request accepted! You are now connected.', 'success');
+                await loadRequests();
+                
+            } catch (error) {
+                console.error('Accept error:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        async function rejectRequest(requestId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/scout-requests/${requestId}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'rejected' })
+                });
+
+                if (!response.ok) throw new Error('Failed to reject request');
+                
+                showNotification('Request rejected.', 'success');
+                await loadRequests();
+                
+            } catch (error) {
+                console.error('Reject error:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        async function cancelRequest(requestId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/scout-requests/${requestId}/cancel`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to cancel request');
+                
+                showNotification('Request cancelled.', 'success');
+                await loadRequests();
+                
+            } catch (error) {
+                console.error('Cancel error:', error);
+                showNotification(error.message, 'error');
+            }
+        }
+
+        // ===== UTILITIES =====
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function formatRequestType(type) {
+            const map = {
+                'recruit_trainer': 'Recruiting Trainer',
+                'recruit_trainee': 'Recruiting Trainee'
+            };
+            return map[type] || type;
+        }
+
+        function getInitials(username) {
+            return username.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '👤';
+        }
+
+        function showNotification(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '9999';
+            document.body.appendChild(alert);
+
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        function loadPage(page) {
+            if (page === 'profile') {
+                window.location.href = '/dashboard.html';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

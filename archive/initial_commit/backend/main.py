@@ -4,13 +4,13 @@ WebSocket for real-time race updates
 REST API for configuration and results
 """
 
-from fastapi import FastAPI, File, UploadFile, WebSocket, HTTPException, Depends
+from fastapi import FastAPI, File, UploadFile, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import json
 import asyncio
-from typing import Dict, List, Optional
+from typing import Dict, List
 import os
 import sys
 import traceback as tb
@@ -29,8 +29,6 @@ sys.excepthook = handle_exception
 from app.models.race import RaceConfig, RaceFrame, RaceResult, ParticipantStats
 from app.services.race_service import race_service
 from app.races import G1_RACES, G2_RACES, G3_RACES, INTERNATIONAL_RACES, Racecourse, Surface
-from app.db import init_db
-from app.routes import auth, stats, admin, races, chat, friends, dms, umalinkedin
 
 # Import skills from skills.py (in backend root)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -38,45 +36,18 @@ from skills import SKILLS_DATABASE
 
 app = FastAPI(
     title="Uma Racing Simulator API",
-    description="Real-time horse racing simulation engine with multiplayer stats and racing",
-    version="2.0.0"
+    description="Real-time horse racing simulation engine",
+    version="1.0.0"
 )
 
-# Enable CORS for React/HTML frontend
+# Enable CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:5500", "*"],
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize database on startup
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on application startup"""
-    print("\n" + "="*60)
-    print("Uma Racing Web - Backend Starting...")
-    print("="*60)
-    try:
-        init_db()
-        print("[OK] Database initialized successfully")
-    except Exception as e:
-        print(f"[ERROR] Database initialization error: {e}")
-        import traceback
-        traceback.print_exc()
-        # Don't raise - let the server keep running
-        pass
-
-# Include API routes
-app.include_router(auth.router)
-app.include_router(stats.router)
-app.include_router(admin.router)
-app.include_router(races.router)
-app.include_router(chat.router)
-app.include_router(friends.router)
-app.include_router(dms.router)
-app.include_router(umalinkedin.router)
 
 # Store WebSocket connections
 active_connections: Dict[str, WebSocket] = {}
@@ -373,33 +344,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "service": "Uma Racing Simulator API v2.0"}
-
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "service": "Uma Racing Web API",
-        "version": "2.0.0",
-        "documentation": "/docs",
-        "endpoints": {
-            "racing": "/api/races",
-            "authentication": "/api/auth",
-            "stats": "/api/stats",
-            "admin": "/api/admin",
-            "chat": "/api/chat",
-            "friends": "/api/friends",
-            "dms": "/api/dms"
-        }
-    }
+    return {"status": "healthy", "service": "Uma Racing Simulator API"}
 
 if __name__ == "__main__":
     import uvicorn
-    print("\n" + "="*60)
-    print("Uma Racing Web - Starting Backend Server")
-    print("="*60)
-    print("\n[INFO] API Server:     http://localhost:5000")
-    print("[INFO] API Docs:       http://localhost:5000/docs")
-    print("[INFO] Frontend:       http://localhost:5500 (if using Live Server)")
-    print("\n" + "="*60)
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

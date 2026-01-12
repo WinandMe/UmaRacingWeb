@@ -1,199 +1,237 @@
-# 🏇 UmaRacingWeb
+﻿#  UmaRacingWeb
 
-A modern web-based racing simulation platform for Uma Musume Pretty Derby, featuring real-time race visualization, comprehensive race configuration, and detailed horse statistics.
+A modern web-based **persistent multiplayer racing simulator** for Uma Musume Pretty Derby with user authentication, stat management, racing, and social features.
 
-## ✨ Features
+##  Features
 
-- **🎮 Real-time Race Simulation**: Watch races unfold in real-time with WebSocket-powered updates
-- **⚙️ Advanced Config Generator**: Create custom race configurations with 169+ races across G1, G2, G3, and International categories
-- **📊 Detailed Statistics**: View comprehensive horse stats, aptitudes, skills, and performance metrics
-- **🎯 Skill System**: Access 7,920+ skills with rarity levels, icons, and detailed descriptions
-- **🏟️ Complete Race Database**: 
-  - 26 G1 Races (Arima Kinen, Japan Cup, Tokyo Yushun, etc.)
-  - 35 G2 Races
-  - 40 G3 Races
-  - 68 International Races
-- **🔍 Smart Filtering**: Filter races by category and racecourse
-- **💾 Config Management**: Save and load race configurations as JSON files
-- **🎨 Modern UI**: Beautiful, responsive interface built with React and Tailwind CSS
-- **📈 Live Commentary**: Dynamic race commentary with position updates
+### Core Racing System
+- ** Real-time Race Simulation**: Watch races unfold with WebSocket-powered updates
+- ** Complete Race Database**: 169+ races across G1, G2, G3, and International categories
+- ** Race Analytics**: Detailed results, participant stats, and performance tracking
 
-## 🚀 Quick Start
+### User & Stat Management
+- ** User Roles**: Trainee (submit stats), Trainer (manage trainees), Admin (system control)
+- ** Input-Only Stat System**: Stats are immutable spreadsheet-driven inputs (no grinding/decay)
+- ** Validation**: Automatic stat validation with optional admin override
+- ** Audit Trail**: Complete history of all stat submissions and admin actions
 
-### Prerequisites
-- Python 3.8+
-- Node.js 16+
-- npm or yarn
+### Social Features
+- ** Public Chat**: Real-time messaging with admin moderation
+- ** Friends System**: Send/accept friend requests with blocking capability
+- ** Direct Messages**: Private conversations with admin oversight
+- ** Moderation**: Chat deletion, user banning, and content review
 
-### Backend Setup
+### Admin Tools
+- ** User Management**: Ban/unban users with audit logging
+- ** Stat Overrides**: Override any stat for special cases
+- ** Audit Log**: Full visibility into all system actions
+- ** Content Review**: View conversations and user activity
+
+##  Quick Start (5 Minutes)
+
+### 1. Install Dependencies
 ```bash
 cd backend
-python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
+```
+
+### 2. Start Backend Server
+```bash
 python main.py
 ```
 
-Backend runs on `http://localhost:8000`
+Expected output:
+```
+============================================================
+ Uma Racing Web - Starting Backend Server
+============================================================
 
-### Frontend Setup
-```bash
-cd frontend
-npm install
-npm start
+ API Server:     http://localhost:8000
+ API Docs:       http://localhost:8000/docs
+ Frontend:       http://localhost:5500 (if using Live Server)
+
+============================================================
+ Database initialized successfully
+INFO:     Uvicorn running on http://0.0.0.0:8000
 ```
 
-Frontend runs on `http://localhost:3000`
+### 3. Start Frontend (New Terminal)
+**Option A: Using VS Code Live Server (Recommended)**
+- Right-click `frontend/register.html`  "Open with Live Server"
 
-## 📖 Usage
+**Option B: Python HTTP Server**
+```bash
+cd frontend
+python -m http.server 5500
+```
 
-### 1. Config Generator
-- Click **"⚙️ Config Generator"** to create custom race configurations
-- Select race category (G1/G2/G3/International)
-- Filter races by racecourse
-- Add and customize horses with stats, aptitudes, and skills
-- **Save as JSON** to export configurations
-- **Load Config** to start the race immediately
+### 4. Access Application
+| Component | URL |
+|-----------|-----|
+| **Frontend** | http://localhost:5500 |
+| **API Server** | http://localhost:8000 |
+| **API Docs** | http://localhost:8000/docs |
 
-### 2. Config Loader
-- Upload existing race configuration JSON files
-- Start races and watch them unfold in real-time
-- Click on horse names to view detailed statistics
-- Get Tazuna's advice based on race performance
+### Demo Credentials
+```
+Trainee: trainee_demo / password123
+Trainer: trainer_demo / password123
+Admin:   admin / admin123
+```
 
-### 3. Race Categories
-- **G1**: 26 prestigious races including Arima Kinen (¥500M), Japan Cup, Tokyo Yushun
-- **G2**: 35 grade-2 races across various distances and surfaces
-- **G3**: 40 grade-3 races with diverse conditions
-- **International**: 68 races from around the world
+** [See Full Startup Guide](STARTUP.md) for detailed instructions**
 
-## 🛠️ Tech Stack
+##  How It Works
+
+### For Trainees
+1. Register as Trainee
+2. View your Uma Musume details
+3. Submit stats (Speed, Stamina, Power, Guts, Wit: 0-9999 each)
+4. Stats are locked once submitted (no re-grinding)
+5. Enter races with locked stats
+6. Chat and make friends
+
+### For Trainers
+1. Register as Trainer  
+2. Own and manage trainees (Uma Musume)
+3. Submit stats on behalf of trainees
+4. Enter trainees in races
+5. View submission history and audit trail
+
+### For Admins
+1. User management (ban/unban)
+2. Override stats for special cases
+3. Moderate chat and DMs
+4. View complete audit logs
+5. System configuration
+
+##  Tech Stack
 
 ### Backend
-- **FastAPI**: Modern Python web framework
-- **WebSockets**: Real-time race updates
-- **Pydantic**: Data validation and serialization
-- **Uvicorn**: ASGI server
+- **FastAPI** - REST API framework
+- **SQLAlchemy** - ORM for database operations
+- **SQLite** - Development database (PostgreSQL ready)
+- **JWT** - Secure token authentication
+- **Bcrypt** - Password hashing
+- **Uvicorn** - ASGI application server
 
 ### Frontend
-- **React 18**: Modern UI library
-- **Tailwind CSS**: Utility-first CSS framework
-- **Framer Motion**: Animation library
-- **Axios**: HTTP client
-- **WebSocket API**: Real-time communication
+- **HTML5/CSS3** - Modern responsive design
+- **JavaScript (ES6+)** - Dynamic interactions
+- **localStorage** - Token persistence
+- **Fetch API** - API communication
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 UmaRacingWeb/
-├── backend/
-│   ├── main.py                 # FastAPI application entry point
-│   ├── requirements.txt        # Python dependencies
-│   ├── app/
-│   │   ├── models/
-│   │   │   ├── race.py        # Race data models
-│   │   │   └── horse.py       # Horse data models
-│   │   ├── services/
-│   │   │   └── race_service.py # Race simulation engine (4,734 lines)
-│   │   ├── routes/
-│   │   │   └── race_routes.py  # API endpoints
-│   │   ├── races.py            # Complete race database (169 races, 3,241 lines)
-│   │   └── websocket/
-│   │       └── manager.py      # WebSocket connection manager
-│   └── skills.py               # Skills database (7,920+ skills)
-├── frontend/
-│   ├── package.json            # Node dependencies
-│   ├── public/
-│   ├── src/
-│   │   ├── App.js             # Main application component
-│   │   ├── components/
-│   │   │   ├── ConfigGenerator.js  # Race config generator
-│   │   │   ├── ConfigLoader.js     # Config file loader
-│   │   │   ├── RaceVisualization.js # Race display
-│   │   │   └── HorseStats.js       # Horse statistics modal
-│   │   ├── styles/
-│   │   └── utils/
-│   └── tailwind.config.js     # Tailwind CSS configuration
-├── LICENSE
-├── README.md
-└── QUICKSTART.md              # Detailed setup guide
+ backend/
+    main.py                      # FastAPI entry point
+    requirements.txt             # Dependencies
+    app/
+       db.py                   # Database setup
+       models/
+          database.py         # SQLAlchemy models
+          user.py             # Auth models
+          race.py             # Racing models
+       services/
+          auth_service.py    # JWT & password
+          stat_validator.py  # Stat validation
+          race_service.py     # Race engine
+       routes/
+           auth.py             # Authentication
+           stats.py            # Stats
+           races.py            # Races
+           chat.py             # Chat
+           friends.py          # Friends
+           dms.py              # Messaging
+           admin.py            # Admin
+    races.py                    # Race database
+    skills.py                   # Skills database
+
+ frontend/
+    register.html               # Registration
+    login.html                  # Login
+    dashboard.html              # Main dashboard
+    admin-dashboard.html        # Admin panel
+
+ docs/
+    STAT_SYSTEM.md             # Stat system design
+    DATABASE_SCHEMA.md         # Database schema
+
+ STARTUP.md                      # Setup guide
+ README.md
 ```
 
-## 🎯 API Endpoints
+##  API Endpoints
 
-### Race Management
-- `POST /api/race/load-config` - Upload and load race configuration
-- `GET /api/race/start` - Start the race simulation
-- `GET /api/race/status` - Get current race status
-- `WS /ws/{client_id}` - WebSocket connection for real-time updates
+### Authentication (`/api/auth`)
+- `POST /register` - Create account
+- `POST /login` - Login with JWT
+- `GET /me` - Current user info
 
-### Data Access
-- `GET /api/race-categories` - Get race category counts
-- `GET /api/races` - Get all races organized by category
-- `GET /api/races/{category}` - Get races for specific category (G1/G2/G3/International)
-- `GET /api/skills` - Get all 7,920+ skills with details
-- `GET /api/racecourses` - Get list of all racecourses
+### Stats (`/api/stats`)
+- `POST /submit` - Submit stats
+- `GET /{trainee_id}` - Latest stats
+- `GET /{trainee_id}/history` - History
 
-## 🎮 Race Configuration Format
+### Races (`/api/races`)
+- `POST /create` - Create race
+- `GET /` - List races
+- `POST /{race_id}/enter` - Enter race
 
-```json
-{
-  "race": {
-    "name": "Arima Kinen",
-    "distance": 2500,
-    "type": "Long",
-    "surface": "Turf",
-    "racecourse": "Nakayama",
-    "track_condition": "Good"
-  },
-  "umas": [
-    {
-      "name": "King Argentine",
-      "running_style": "FR",
-      "gate_number": 1,
-      "mood": "Normal",
-      "stats": {
-        "Speed": 1000,
-        "Stamina": 1000,
-        "Power": 1000,
-        "Guts": 1000,
-        "Wit": 1000
-      },
-      "distance_aptitude": {
-        "Sprint": "A",
-        "Mile": "A",
-        "Medium": "A",
-        "Long": "S"
-      },
-      "surface_aptitude": {
-        "Turf": "A",
-        "Dirt": "B"
-      },
-      "skills": ["skill_id_1", "skill_id_2"]
-    }
-  ]
-}
+### Social
+- `POST /friends/request` - Friend request
+- `GET /friends/list` - Friends list
+- `POST /chat/send` - Public chat
+- `POST /dms/send` - DM
+
+### Admin (`/api/admin`)
+- `POST /users/ban` - Ban user
+- `POST /stats/override` - Override stat
+- `GET /audit-log` - Audit log
+
+##  Key Design Principles
+
+- **No Training/Grinding**: Stats are input-only, no progression decay
+- **Immutable Snapshots**: Race stats frozen at entry time
+- **Full Audit Trail**: Every action logged for transparency
+- **Role-Based Access**: Strict permissions per user role
+- **Spreadsheet Integration**: Stats validated against external rules
+
+##  Documentation
+
+- **[STARTUP.md](STARTUP.md)** - Complete setup guide
+- **[STAT_SYSTEM.md](docs/STAT_SYSTEM.md)** - Stat system design
+- **[DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md)** - Database schema
+- **API Docs**: http://localhost:8000/docs (Swagger UI)
+
+##  Deployment
+
+Create `.env` in `backend/`:
+```
+DATABASE_URL=sqlite:///uma_racing.db
+JWT_SECRET=your-secret-key
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
 ```
 
-## 🤝 Contributing
+For production:
+- Use PostgreSQL database
+- Generate secure JWT secret
+- Set specific CORS domains
+- Enable HTTPS
+- Use production ASGI server
 
-Please contact me via GitHub / email. outside of it will considered invalid
+##  License
 
-## 📝 License
+All rights reserved - see [LICENSE](LICENSE)
 
-This project is licensed under the All rights reserved with explicit permissions - see the [LICENSE](LICENSE) file for details.
+##  Acknowledgments
 
-## 🙏 Acknowledgments
-
-- Based on the original UmaRacingProject
-- Uma Musume Pretty Derby game mechanics and data
-- Community contributions and feedback
-
-## 📧 Support
-
-For issues, questions, or suggestions, please open an issue on GitHub.
+- Uma Musume Pretty Derby by Cygames
+- Original UmaRacingProject
 
 ---
 
-**Made with ❤️ for Uma Musume fans**
+Made with  for Uma Musume fans
