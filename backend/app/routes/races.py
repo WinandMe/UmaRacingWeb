@@ -1,5 +1,5 @@
 """Race entry and management endpoints"""
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -19,7 +19,11 @@ class RaceCreateRequest(BaseModel):
     surface: Optional[str] = None
     race_type: Optional[str] = None
     track_condition: Optional[str] = None
+    max_participants: Optional[int] = 12
+    prize_pool: Optional[int] = 0
     scheduled_at: Optional[datetime] = None
+    # Accept frontend "start_time" as an alias for scheduled_at
+    start_time: Optional[datetime] = None
     config_json: Optional[dict] = None
 
 class RaceParticipantEntry(BaseModel):
@@ -57,13 +61,29 @@ class RaceResponse(BaseModel):
     track_condition: Optional[str]
     status: str
     participants_count: int
+    max_participants: int
+    prize_pool: int
     scheduled_at: Optional[datetime]
+    started_at: Optional[datetime]
+    finished_at: Optional[datetime]
     created_at: datetime
     
     class Config:
         from_attributes = True
 
-def get_current_user(authorization: Optional[str] = None, db: Session = Depends(get_db)) -> TokenData:
+def _map_status_to_frontend(db_status: str) -> str:
+    """Map database race status to frontend nomenclature."""
+    mapping = {
+        "scheduled": "draft",
+        "registration": "registration",
+        "ready": "ready",
+        "running": "running",
+        "finished": "completed",
+        "cancelled": "cancelled",
+    }
+    return mapping.get(db_status, db_status)
+
+def get_current_user(authorization: Optional[str] = Header(None), db: Session = Depends(get_db)) -> TokenData:
     """Extract and validate current user from Authorization header"""
     if not authorization:
         raise HTTPException(
@@ -96,17 +116,10 @@ def get_current_user(authorization: Optional[str] = None, db: Session = Depends(
     
     return token_data
 
-@router.post("/create", response_model=RaceResponse)
-async def create_race(
-    request: RaceCreateRequest,
-    authorization: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    """Create a new race"""
-    
-    token_data = get_current_user(authorization, db)
-    user = db.query(User).filter(User.id == token_data.user_id).first()
-    
+def _create_race_impl(request: RaceCreateRequest, user: User, db: Session) -> RaceResponse:
+    """Internal helper to create a race and return response"""
+    # Prefer scheduled_at but allow start_time from frontend
+    scheduled = request.scheduled_at or request.start_time
     new_race = Race(
         name=request.name,
         race_category=request.race_category,
@@ -115,17 +128,19 @@ async def create_race(
         surface=request.surface,
         race_type=request.race_type,
         track_condition=request.track_condition,
+        max_participants=request.max_participants or 12,
+        prize_pool=request.prize_pool or 0,
         status="scheduled",
-        scheduled_at=request.scheduled_at,
+        scheduled_at=scheduled,
         config_json=request.config_json,
-        created_by=user.id,
+        created_by=user.id if user else None,
         created_at=datetime.utcnow()
     )
-    
+
     db.add(new_race)
     db.commit()
     db.refresh(new_race)
-    
+
     return RaceResponse(
         id=new_race.id,
         name=new_race.name,
@@ -135,18 +150,49 @@ async def create_race(
         surface=new_race.surface,
         race_type=new_race.race_type,
         track_condition=new_race.track_condition,
-        status=new_race.status,
+        status=_map_status_to_frontend(new_race.status),
         participants_count=0,
+        max_participants=new_race.max_participants,
+        prize_pool=new_race.prize_pool,
         scheduled_at=new_race.scheduled_at,
+        started_at=new_race.started_at,
+        finished_at=new_race.finished_at,
         created_at=new_race.created_at
     )
+
+@router.post("/create", response_model=RaceResponse)
+async def create_race(
+    request: RaceCreateRequest,
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
+):
+    """Create a new race (legacy endpoint)"""
+    token_data = get_current_user(authorization, db)
+    # Require admin role for creating races
+    if token_data.role != UserRole.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admins can create races")
+    user = db.query(User).filter(User.id == token_data.user_id).first()
+    return _create_race_impl(request, user, db)
+
+@router.post("/", response_model=RaceResponse)
+async def create_race_rest(
+    request: RaceCreateRequest,
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
+):
+    """Create a new race (RESTful POST /api/races)"""
+    token_data = get_current_user(authorization, db)
+    if token_data.role != UserRole.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admins can create races")
+    user = db.query(User).filter(User.id == token_data.user_id).first()
+    return _create_race_impl(request, user, db)
 
 @router.post("/{race_id}/enter")
 async def enter_race(
     race_id: int,
     entry: RaceParticipantEntry,
-    authorization: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
 ):
     """Enter a trainee into a race with current stats snapshot"""
     
@@ -284,9 +330,13 @@ async def get_race(race_id: int, db: Session = Depends(get_db)):
         surface=race.surface,
         race_type=race.race_type,
         track_condition=race.track_condition,
-        status=race.status,
+        status=_map_status_to_frontend(race.status),
         participants_count=participant_count,
+        max_participants=race.max_participants,
+        prize_pool=race.prize_pool,
         scheduled_at=race.scheduled_at,
+        started_at=race.started_at,
+        finished_at=race.finished_at,
         created_at=race.created_at
     )
 
@@ -354,10 +404,144 @@ async def list_races(
             surface=race.surface,
             race_type=race.race_type,
             track_condition=race.track_condition,
-            status=race.status,
+            status=_map_status_to_frontend(race.status),
             participants_count=participant_count,
+            max_participants=race.max_participants,
+            prize_pool=race.prize_pool,
             scheduled_at=race.scheduled_at,
+            started_at=race.started_at,
+            finished_at=race.finished_at,
             created_at=race.created_at
         ))
     
     return result
+
+@router.post("/{race_id}/open-registration")
+async def open_registration(
+    race_id: int,
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
+):
+    """Open registration for a race (admin only)"""
+    token_data = get_current_user(authorization, db)
+    from app.models.user import UserRole
+    if token_data.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    race = db.query(Race).filter(Race.id == race_id).first()
+    if not race:
+        raise HTTPException(status_code=404, detail="Race not found")
+    
+    if race.status != "scheduled":
+        raise HTTPException(status_code=400, detail=f"Cannot open registration for race in {race.status} status")
+    
+    race.status = "registration"
+    db.commit()
+    
+    return {"message": "Registration opened", "status": "registration"}
+
+@router.post("/{race_id}/close-registration")
+async def close_registration(
+    race_id: int,
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
+):
+    """Close registration and make race ready to start (admin only)"""
+    token_data = get_current_user(authorization, db)
+    from app.models.user import UserRole
+    if token_data.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    race = db.query(Race).filter(Race.id == race_id).first()
+    if not race:
+        raise HTTPException(status_code=404, detail="Race not found")
+    
+    if race.status != "registration":
+        raise HTTPException(status_code=400, detail=f"Cannot close registration for race in {race.status} status")
+    
+    participant_count = db.query(RaceParticipant).filter(RaceParticipant.race_id == race_id).count()
+    if participant_count < 2:
+        raise HTTPException(status_code=400, detail="Need at least 2 participants to close registration")
+    
+    race.status = "ready"
+    db.commit()
+    
+    return {"message": "Registration closed, race ready to start", "status": "ready"}
+
+@router.post("/{race_id}/start")
+async def start_race(
+    race_id: int,
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
+):
+    """Start a race (admin only)"""
+    token_data = get_current_user(authorization, db)
+    from app.models.user import UserRole
+    if token_data.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    race = db.query(Race).filter(Race.id == race_id).first()
+    if not race:
+        raise HTTPException(status_code=404, detail="Race not found")
+    
+    if race.status not in ["ready", "scheduled"]:
+        raise HTTPException(status_code=400, detail=f"Cannot start race in {race.status} status")
+    
+    participant_count = db.query(RaceParticipant).filter(RaceParticipant.race_id == race_id).count()
+    if participant_count < 2:
+        raise HTTPException(status_code=400, detail="Need at least 2 participants to start race")
+    
+    race.status = "running"
+    race.started_at = datetime.utcnow()
+    db.commit()
+    
+    return {"message": "Race started", "status": "running", "started_at": race.started_at}
+
+@router.post("/{race_id}/finish")
+async def finish_race(
+    race_id: int,
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
+):
+    """Mark race as finished (admin only or race engine)"""
+    token_data = get_current_user(authorization, db)
+    from app.models.user import UserRole
+    if token_data.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    race = db.query(Race).filter(Race.id == race_id).first()
+    if not race:
+        raise HTTPException(status_code=404, detail="Race not found")
+    
+    if race.status != "running":
+        raise HTTPException(status_code=400, detail=f"Cannot finish race in {race.status} status")
+    
+    race.status = "finished"
+    race.finished_at = datetime.utcnow()
+    db.commit()
+    
+    return {"message": "Race finished", "status": "finished", "finished_at": race.finished_at}
+
+@router.delete("/{race_id}")
+async def delete_race(
+    race_id: int,
+    db: Session = Depends(get_db),
+    authorization: Optional[str] = Header(None)
+):
+    """Delete a race (admin only)"""
+    token_data = get_current_user(authorization, db)
+    from app.models.user import UserRole
+    if token_data.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    race = db.query(Race).filter(Race.id == race_id).first()
+    if not race:
+        raise HTTPException(status_code=404, detail="Race not found")
+    
+    if race.status in ["running", "finished"]:
+        raise HTTPException(status_code=400, detail="Cannot delete running or finished races")
+    
+    db.delete(race)
+    db.commit()
+    
+    return {"message": "Race deleted"}

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends - Uma Racing Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 50;
+        }
+
+        .navbar-brand {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn.menu {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .filter-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .filter-tab:hover {
+            color: #e0e0e0;
+        }
+
+        .search-box {
+            margin-bottom: 30px;
+        }
+
+        .search-box input {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .friend-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .friend-card:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .friend-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 15px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .friend-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .friend-status {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 12px;
+        }
+
+        .friend-info {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .online-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            margin-right: 5px;
+        }
+
+        .offline-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            margin-right: 5px;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .action-btn.danger {
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .empty-state p {
+            margin-bottom: 30px;
+        }
+
+        .add-friend-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-friend-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand">👥 Friends</div>
+        <div class="navbar-buttons">
+            <button class="nav-btn" onclick="navigateTo('/main-menu.html')">Main Menu</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Friends</h1>
+            <div style="display: flex; gap: 15px;">
+                <span id="friendCount" style="padding: 10px 20px; background: rgba(102, 126, 234, 0.2); border-radius: 6px; border: 1px solid rgba(102, 126, 234, 0.3);">0 Friends</span>
+            </div>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" onclick="switchTab('all')">All Friends</button>
+            <button class="filter-tab" onclick="switchTab('online')">Online</button>
+            <button class="filter-tab" onclick="switchTab('pending')">Pending Requests</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" placeholder="Search friends..." id="searchInput">
+        </div>
+
+        <div id="friendsContainer" class="friends-grid">
+            <!-- Friends will be loaded here -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">👥</div>
+            <h2>No friends yet</h2>
+            <p>Start connecting with other users to build your friend list!</p>
+            <button class="add-friend-btn" onclick="showFindFriends()">Find Friends</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentUser = null;
+        let friends = [];
+        let pendingRequests = [];
+        let currentTab = 'all';
+
+        async function init() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Not authenticated');
+                currentUser = await response.json();
+                await loadFriends();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function loadFriends() {
+            try {
+                const token = localStorage.getItem('token');
+                window.LoadingOverlay.show('Loading friends...');
+                
+                const [friendsRes, pendingRes] = await Promise.all([
+                    fetch(`${API_BASE}/friends/list`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_BASE}/friends/pending`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                if (friendsRes.ok) {
+                    const friendsData = await friendsRes.json();
+                    friends = friendsData.map(f => ({
+                        id: f.friend.id,
+                        name: f.friend.username,
+                        avatar: f.friend.username.charAt(0).toUpperCase(),
+                        role: f.friend.role.charAt(0).toUpperCase() + f.friend.role.slice(1),
+                        wins: 0,
+                        avgSpeed: 0,
+                        level: 1,
+                        online: false,
+                        addedDate: new Date(f.created_at).toISOString().split('T')[0]
+                    }));
+                } else {
+                    friends = [];
+                }
+
+                if (pendingRes.ok) {
+                    const pendingData = await pendingRes.json();
+                    pendingRequests = pendingData.filter(req => req.to_user.id === currentUser.id).map(req => ({
+                        id: req.id,
+                        name: req.from_user.username,
+                        avatar: req.from_user.username.charAt(0).toUpperCase(),
+                        role: req.from_user.role,
+                        sentDate: new Date(req.created_at).toISOString().split('T')[0]
+                    }));
+                } else {
+                    pendingRequests = [];
+                }
+
+                window.LoadingOverlay.hide();
+                renderFriends();
+            } catch (error) {
+                window.LoadingOverlay.hide();
+                console.error('Failed to load friends:', error);
+                friends = [];
+                pendingRequests = [];
+                renderFriends();
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderFriends();
+        }
+
+        function renderFriends() {
+            const container = document.getElementById('friendsContainer');
+            const emptyState = document.getElementById('emptyState');
+            let displayFriends = [];
+
+            if (currentTab === 'all') {
+                displayFriends = friends;
+            } else if (currentTab === 'online') {
+                displayFriends = friends.filter(f => f.online);
+            } else if (currentTab === 'pending') {
+                displayFriends = pendingRequests;
+            }
+
+            if (displayFriends.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            container.innerHTML = displayFriends.map(friend => `
+                <div class="friend-card">
+                    <div class="friend-avatar">${friend.avatar}</div>
+                    <div class="friend-name">${friend.name}</div>
+                    <div class="friend-status">
+                        ${friend.online ? '<span class="online-indicator"></span>Online' : '<span class="offline-indicator"></span>Offline'}
+                    </div>
+                    
+                    ${currentTab !== 'pending' ? `
+                        <div class="stats-row">
+                            <div class="stat">
+                                <div class="stat-value">${friend.wins || 0}</div>
+                                <div class="stat-label">Wins</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${friend.level || 1}</div>
+                                <div class="stat-label">Level</div>
+                            </div>
+                        </div>
+                        <div class="friend-info">
+                            ${friend.role} • Joined ${friend.addedDate}
+                        </div>
+                    ` : `
+                        <div class="friend-info">
+                            Requested ${friend.sentDate}
+                        </div>
+                    `}
+
+                    <div class="friend-actions">
+                        ${currentTab === 'pending' ? `
+                            <button class="action-btn primary" onclick="acceptFriend(${friend.id})">Accept</button>
+                            <button class="action-btn danger" onclick="rejectFriend(${friend.id})">Reject</button>
+                        ` : `
+                            <button class="action-btn primary" onclick="messageFriend(${friend.id})">Message</button>
+                            <button class="action-btn danger" onclick="removeFriend(${friend.id})">Remove</button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('friendCount').textContent = `${friends.length} Friends`;
+        }
+
+        function messageFriend(friendId) {
+            window.location.href = '/messages.html';
+        }
+
+        async function removeFriend(friendId) {
+            if (!confirm('Are you sure you want to remove this friend?')) return;
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/friends/remove/${friendId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    friends = friends.filter(f => f.id !== friendId);
+                    renderFriends();
+                } else {
+                    alert('Failed to remove friend');
+                }
+            } catch (error) {
+                console.error('Failed to remove friend:', error);
+                alert('Failed to remove friend');
+            }
+        }
+
+        async function acceptFriend(friendId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/friends/accept/${friendId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    await loadFriends();
+                    currentTab = 'all';
+                    renderFriends();
+                } else {
+                    alert('Failed to accept friend request');
+                }
+            } catch (error) {
+                console.error('Failed to accept request:', error);
+                alert('Failed to accept friend request');
+            }
+        }
+
+        async function rejectFriend(friendId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/friends/reject/${friendId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    pendingRequests = pendingRequests.filter(r => r.id !== friendId);
+                    renderFriends();
+                } else {
+                    alert('Failed to reject friend request');
+                }
+            } catch (error) {
+                console.error('Failed to reject request:', error);
+                alert('Failed to reject friend request');
+            }
+        }
+
+        function showFindFriends() {
+            window.location.href = '/umalinkedin.html';
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const container = document.getElementById('friendsContainer');
+            const cards = container.querySelectorAll('.friend-card');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('.friend-name').textContent.toLowerCase();
+                if (name.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize on page load
+        init();
+    </script>
+    <script src="assets/loading-overlay.js"></script>
+    <script src="assets/page-transitions.js"></script>
+</body>
+</html>

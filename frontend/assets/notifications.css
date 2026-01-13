@@ -1,0 +1,151 @@
+/* Global notification system */
+.notification-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.notification-toast {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid rgba(255, 255, 255, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.notification-toast.success {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(22, 163, 74, 0.95));
+  border-left-color: #22c55e;
+}
+
+.notification-toast.error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+  border-left-color: #ef4444;
+}
+
+.notification-toast.warning {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.95), rgba(245, 158, 11, 0.95));
+  border-left-color: #fbbf24;
+}
+
+.notification-toast.announcement {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(124, 58, 237, 0.95));
+  border-left-color: #8b5cf6;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 20px 24px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.notification-toast.hiding {
+  animation: slideOutRight 0.3s ease forwards;
+}
+
+@keyframes slideOutRight {
+  to {
+    opacity: 0;
+    transform: translateX(400px);
+  }
+}
+
+.notification-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.notification-message {
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.notification-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.notification-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.notification-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.5);
+  animation: progressBar linear forwards;
+}
+
+@keyframes progressBar {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* Race announcement special styling */
+.notification-toast.race-update {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.6);
+}
+
+.notification-toast.race-milestone {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
+  font-size: 18px;
+}
+
+@media (max-width: 640px) {
+  .notification-container {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Registrations - Uma Racing Web</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .navbar {
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.3); }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+        .race-info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .info-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+        }
+        .info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .registrations-grid {
+            display: grid;
+            gap: 15px;
+        }
+        .registration-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 20px;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .registration-card:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .trainee-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .registration-info {
+            flex: 1;
+        }
+        .trainee-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .trainer-name {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+        }
+        .stats-row {
+            display: flex;
+            gap: 20px;
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+        }
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .registration-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .action-btn.approve {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+        .action-btn.approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+        }
+        .action-btn.reject {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .action-btn.reject:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.pending { background: rgba(251, 191, 36, 0.3); color: #fbbf24; }
+        .status-badge.approved { background: rgba(34, 197, 94, 0.3); color: #22c55e; }
+        .status-badge.rejected { background: rgba(239, 68, 68, 0.3); color: #ef4444; }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
+    <link rel="stylesheet" href="assets/notifications.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand">📝 Race Registrations</div>
+        <div class="navbar-buttons">
+            <button class="nav-btn" onclick="navigateTo('/admin-race-management.html')">Back to Races</button>
+            <button class="nav-btn" onclick="navigateTo('/main-menu.html')">Main Menu</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 id="raceTitle">Loading...</h1>
+            <p style="color: rgba(255, 255, 255, 0.6); margin-top: 10px;">Review and approve trainee registrations</p>
+        </div>
+
+        <div class="race-info-card" id="raceInfoCard">
+            <!-- Race info will be loaded here -->
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('pending')" data-tab="pending">Pending Approval</button>
+            <button class="tab-btn" onclick="switchTab('approved')" data-tab="approved">Approved</button>
+            <button class="tab-btn" onclick="switchTab('rejected')" data-tab="rejected">Rejected</button>
+        </div>
+
+        <div class="bulk-actions" id="bulkActions" style="display: none;">
+            <button class="btn-primary" onclick="approveAll()">Approve All Pending</button>
+        </div>
+
+        <div class="registrations-grid" id="registrationsGrid">
+            <!-- Registrations will be loaded here -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div style="font-size: 64px; margin-bottom: 20px;">📝</div>
+            <h2>No registrations yet</h2>
+            <p>Waiting for trainers to register their trainees...</p>
+        </div>
+    </div>
+
+    <script>
+        // API_BASE is defined in api-config.js
+        let currentUser = null;
+        let currentTab = 'pending';
+        let raceId = null;
+        let race = null;
+        let registrations = [];
+
+        async function init() {
+            // Get race ID from URL
+            const params = new URLSearchParams(window.location.search);
+            raceId = params.get('id');
+
+            if (!raceId) {
+                Notifications.error('No race ID provided');
+                setTimeout(() => navigateTo('/admin-race-management.html'), 2000);
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Not authenticated');
+                currentUser = await response.json();
+                if (currentUser.role !== 'admin') {
+                    Notifications.error('Only admins can access this page');
+                    setTimeout(() => navigateTo('/main-menu.html'), 2000);
+                    return;
+                }
+                await loadRaceAndRegistrations();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function loadRaceAndRegistrations() {
+            try {
+                const token = localStorage.getItem('token');
+                window.LoadingOverlay.show('Loading registrations...');
+
+                const [raceRes, regRes] = await Promise.all([
+                    fetch(`${API_BASE}/races/${raceId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch(`${API_BASE}/races/${raceId}/participants`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
+
+                if (raceRes.ok) {
+                    race = await raceRes.json();
+                    renderRaceInfo();
+                }
+
+                if (regRes.ok) {
+                    const participants = await regRes.json();
+                    // Map participants to approved registrations
+                    registrations = participants.map(p => ({
+                        id: p.id,
+                        status: 'approved',
+                        trainee: { username: p.trainee_name },
+                        trainer: { username: '-' },
+                        trainee_stats: null,
+                        created_at: race.created_at
+                    }));
+                } else {
+                    registrations = [];
+                }
+
+                window.LoadingOverlay.hide();
+                renderRegistrations();
+            } catch (error) {
+                window.LoadingOverlay.hide();
+                console.error('Failed to load data:', error);
+                Notifications.error('Failed to load registrations');
+            }
+        }
+
+        function renderRaceInfo() {
+            document.getElementById('raceTitle').textContent = race.name;
+            document.getElementById('raceInfoCard').innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Distance</div>
+                        <div class="info-value">${race.distance}m</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Surface</div>
+                        <div class="info-value">${race.surface || 'Turf'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Participants</div>
+                        <div class="info-value">${registrations.filter(r => r.status === 'approved').length}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Prize Pool</div>
+                        <div class="info-value">$${(race.prize_pool || 0).toLocaleString()}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Start Time</div>
+                        <div class="info-value">${new Date(race.start_time).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            renderRegistrations();
+        }
+
+        function renderRegistrations() {
+            const grid = document.getElementById('registrationsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const bulkActions = document.getElementById('bulkActions');
+
+            const filtered = registrations.filter(r => r.status === currentTab);
+
+            bulkActions.style.display = currentTab === 'pending' && filtered.length > 0 ? 'flex' : 'none';
+
+            if (filtered.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = filtered.map(reg => `
+                <div class="registration-card">
+                    <div class="trainee-avatar">${reg.trainee.username.charAt(0).toUpperCase()}</div>
+                    <div class="registration-info">
+                        <div class="trainee-name">${reg.trainee.username}</div>
+                        <div class="trainer-name">Trainer: ${reg.trainer.username}</div>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <div class="stat-label">Level</div>
+                                <div class="stat-value">${reg.trainee_stats?.level || 1}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Wins</div>
+                                <div class="stat-value">${reg.trainee_stats?.wins || 0}</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Win Rate</div>
+                                <div class="stat-value">${reg.trainee_stats?.win_rate || 0}%</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">Registered</div>
+                                <div class="stat-value">${new Date(race.scheduled_at || race.created_at).toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="registration-actions">
+                        <span class="status-badge ${reg.status}">${reg.status.toUpperCase()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function approveRegistration() { Notifications.info('Manual approvals disabled. Showing participants only.'); }
+        async function rejectRegistration() { Notifications.info('Manual approvals disabled. Showing participants only.'); }
+        async function approveAll() { Notifications.info('Manual approvals disabled. Showing participants only.'); }
+
+        init();
+    </script>
+    <script src="assets/loading-overlay.js"></script>
+    <script src="assets/notifications.js"></script>
+    <script src="assets/page-transitions.js"></script>
+</body>
+</html>

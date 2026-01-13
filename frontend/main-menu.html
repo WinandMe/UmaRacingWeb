@@ -112,6 +112,7 @@
             gap: 120px;
             position: relative;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 25%;
         }
 
         .menu-category {
@@ -173,26 +174,27 @@
         /* Vertical submenu */
         .submenu-container {
             position: absolute;
-            right: 15%;
+            right: 5%;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
             border-radius: 15px;
             padding: 30px;
-            min-width: 300px;
+            min-width: 320px;
             max-height: 60vh;
             overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
             opacity: 0;
             pointer-events: none;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 200;
         }
 
         .submenu-container.show {
             opacity: 1;
             pointer-events: all;
-            right: 10%;
+            right: 3%;
         }
 
         .submenu-title {
@@ -345,6 +347,8 @@
             background: rgba(102, 126, 234, 0.7);
         }
     </style>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
 </head>
 <body>
     <!-- Background particles -->
@@ -405,7 +409,7 @@
     </div>
 
     <script>
-        const API_BASE = "http://localhost:5000/api";
+        // API_BASE is defined in api-config.js
         let currentUser = null;
         let currentCategoryIndex = 0;
         let categories = [];
@@ -418,9 +422,10 @@
                     icon: '🔗',
                     title: 'Network',
                     items: [
-                        { icon: '🌐', text: 'UmalinkedIn', action: () => navigate('/umalinkedin.html') },
-                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/dashboard.html') },
-                        { icon: '👥', text: 'Friends', action: () => navigate('/dashboard.html') }
+                        { icon: '💼', text: 'UmaLinkedIn', action: () => navigate('/umalinkedin.html') },
+                        { icon: '', text: 'Umaddit', action: () => navigate('/umaddit.html') },
+                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/messages.html') },
+                        { icon: '👥', text: 'Friends', action: () => navigate('/friends.html') }
                     ]
                 },
                 {
@@ -428,9 +433,9 @@
                     icon: '🏇',
                     title: 'Racing',
                     items: [
-                        { icon: '🏁', text: 'Race Events', action: () => navigate('/dashboard.html') },
-                        { icon: '📊', text: 'My Stats', action: () => navigate('/dashboard.html') },
-                        { icon: '🏆', text: 'Race History', action: () => navigate('/dashboard.html') }
+                        { icon: '🏁', text: 'Race Events', action: () => navigate('/races.html') },
+                        { icon: '📊', text: 'My Stats', action: () => navigate('/stats.html') },
+                        { icon: '🏆', text: 'Race History', action: () => navigate('/history.html') }
                     ]
                 },
                 {
@@ -438,9 +443,9 @@
                     icon: '👤',
                     title: 'Profile',
                     items: [
-                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/dashboard.html') },
+                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/settings.html') },
                         { icon: '🎨', text: 'Customize Avatar', action: () => showNotification('Coming soon!') },
-                        { icon: '📋', text: 'View Profile', action: () => navigate('/dashboard.html') }
+                        { icon: '📋', text: 'View Profile', action: () => navigate('/profile.html') }
                     ]
                 },
                 {
@@ -460,9 +465,20 @@
                     icon: '🔗',
                     title: 'Network',
                     items: [
-                        { icon: '🌐', text: 'UmalinkedIn', action: () => navigate('/umalinkedin.html') },
-                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/dashboard.html') },
-                        { icon: '👥', text: 'Friends', action: () => navigate('/dashboard.html') }
+                        { icon: '💼', text: 'UmaLinkedIn', action: () => navigate('/umalinkedin.html') },
+                        { icon: '', text: 'Umaddit', action: () => navigate('/umaddit.html') },
+                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/messages.html') },
+                        { icon: '👥', text: 'Friends', action: () => navigate('/friends.html') }
+                    ]
+                },
+                {
+                    id: 'racing',
+                    icon: '🏁',
+                    title: 'Racing',
+                    items: [
+                        { icon: '📝', text: 'Register for Race', action: () => navigate('/race-registration.html') },
+                        { icon: '🏇', text: 'Live Races', action: () => navigate('/live-races.html') },
+                        { icon: '🏆', text: 'Race Results', action: () => navigate('/races.html') }
                     ]
                 },
                 {
@@ -470,8 +486,8 @@
                     icon: '📚',
                     title: 'Training',
                     items: [
-                        { icon: '🎯', text: 'Trainee List', action: () => navigate('/dashboard.html') },
-                        { icon: '📊', text: 'Manage Stats', action: () => navigate('/dashboard.html') },
+                        { icon: '🎯', text: 'Trainee List', action: () => navigate('/trainees.html') },
+                        { icon: '📊', text: 'Manage Stats', action: () => navigate('/stats.html') },
                         { icon: '🏋️', text: 'Training Programs', action: () => showNotification('Coming soon!') }
                     ]
                 },
@@ -480,9 +496,9 @@
                     icon: '🏇',
                     title: 'Racing',
                     items: [
-                        { icon: '🏁', text: 'Race Events', action: () => navigate('/dashboard.html') },
-                        { icon: '📈', text: 'Performance Analytics', action: () => navigate('/dashboard.html') },
-                        { icon: '🏆', text: 'Race History', action: () => navigate('/dashboard.html') }
+                        { icon: '🏁', text: 'Race Events', action: () => navigate('/races.html') },
+                        { icon: '📈', text: 'Performance Analytics', action: () => navigate('/analytics.html') },
+                        { icon: '🏆', text: 'Race History', action: () => navigate('/history.html') }
                     ]
                 },
                 {
@@ -490,9 +506,9 @@
                     icon: '👤',
                     title: 'Profile',
                     items: [
-                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/dashboard.html') },
+                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/settings.html') },
                         { icon: '🎨', text: 'Customize Avatar', action: () => showNotification('Coming soon!') },
-                        { icon: '📋', text: 'View Profile', action: () => navigate('/dashboard.html') }
+                        { icon: '📋', text: 'View Profile', action: () => navigate('/profile.html') }
                     ]
                 },
                 {
@@ -512,9 +528,10 @@
                     icon: '🔗',
                     title: 'Network',
                     items: [
-                        { icon: '🌐', text: 'UmalinkedIn', action: () => navigate('/umalinkedin.html') },
-                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/dashboard.html') },
-                        { icon: '👥', text: 'Friends', action: () => navigate('/dashboard.html') }
+                        { icon: '💼', text: 'UmaLinkedIn', action: () => navigate('/umalinkedin.html') },
+                        { icon: '', text: 'Umaddit', action: () => navigate('/umaddit.html') },
+                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/messages.html') },
+                        { icon: '👥', text: 'Friends', action: () => navigate('/friends.html') }
                     ]
                 },
                 {
@@ -522,9 +539,11 @@
                     icon: '👑',
                     title: 'Administration',
                     items: [
-                        { icon: '🏛️', text: 'Admin Dashboard', action: () => navigate('/admin-dashboard.html') },
-                        { icon: '👥', text: 'User Management', action: () => navigate('/admin-dashboard.html') },
-                        { icon: '🔨', text: 'Moderation Tools', action: () => navigate('/admin-dashboard.html') },
+                        { icon: '🏛️', text: 'Admin Dashboard', action: () => navigate('/admin-users.html') },
+                        
+                        { icon: '👥', text: 'User Management', action: () => navigate('/admin-users.html') },
+                        { icon: '🔨', text: 'Moderation Tools', action: () => navigate('/admin-moderation.html') },
+                        { icon: '🏁', text: 'Race Management', action: () => navigate('/admin-race-management.html') },
                         { icon: '📊', text: 'System Analytics', action: () => showNotification('Coming soon!') }
                     ]
                 },
@@ -533,9 +552,9 @@
                     icon: '🏇',
                     title: 'Racing',
                     items: [
-                        { icon: '🏁', text: 'Race Events', action: () => navigate('/dashboard.html') },
-                        { icon: '📊', text: 'All Stats', action: () => navigate('/dashboard.html') },
-                        { icon: '🏆', text: 'Race History', action: () => navigate('/dashboard.html') }
+                        { icon: '🏁', text: 'Race Events', action: () => navigate('/races.html') },
+                        { icon: '📊', text: 'All Stats', action: () => navigate('/stats.html') },
+                        { icon: '🏆', text: 'Race History', action: () => navigate('/history.html') }
                     ]
                 },
                 {
@@ -543,9 +562,9 @@
                     icon: '👤',
                     title: 'Profile',
                     items: [
-                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/dashboard.html') },
+                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/settings.html') },
                         { icon: '🎨', text: 'Customize Avatar', action: () => showNotification('Coming soon!') },
-                        { icon: '📋', text: 'View Profile', action: () => navigate('/dashboard.html') }
+                        { icon: '📋', text: 'View Profile', action: () => navigate('/profile.html') }
                     ]
                 },
                 {
@@ -684,10 +703,12 @@
         }
 
         function navigate(path) {
-            showLoading();
-            setTimeout(() => {
+            // Smooth fade-out transition to next page
+            if (typeof navigateTo === 'function') {
+                navigateTo(path);
+            } else {
                 window.location.href = path;
-            }, 500);
+            }
         }
 
         function showLoading() {
@@ -744,5 +765,7 @@
         // Initialize on page load
         window.addEventListener('load', init);
     </script>
+    <script src="assets/loading-overlay.js"></script>
+    <script src="assets/page-transitions.js"></script>
 </body>
 </html>

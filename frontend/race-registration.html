@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Race Registration - UmalinkedIn</title>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
+    <link rel="stylesheet" href="assets/notifications.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 36px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Tabs */
+        .tabs {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ff4757;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* Content Area */
+        .content {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Race Cards */
+        .races-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .race-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .race-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .race-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .race-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .race-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .race-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-open {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .race-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-icon {
+            font-size: 18px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .race-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .race-capacity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .capacity-bar {
+            flex: 1;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .capacity-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        /* Registered Trainee Info */
+        .registered-trainee {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .trainee-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .trainee-info {
+            flex: 1;
+        }
+
+        .trainee-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .trainee-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Action Buttons */
+        .race-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* Trainee Selection Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .trainees-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .trainee-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trainee-card:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(4px);
+        }
+
+        .trainee-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .trainee-card-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .trainee-card-info {
+            flex: 1;
+        }
+
+        .trainee-card-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .trainee-card-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-box {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    <span class="header-icon">🏁</span>
+                    Race Registration
+                </h1>
+                <button class="back-btn" onclick="navigateTo('/main-menu.html')">
+                    ← Back to Menu
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="available">
+                Available Races
+            </button>
+            <button class="tab-btn" data-tab="pending">
+                Pending Approval
+                <span class="tab-badge" id="pending-badge">0</span>
+            </button>
+            <button class="tab-btn" data-tab="upcoming">
+                Upcoming Races
+            </button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Available Races Tab -->
+            <div class="tab-content active" id="available-tab">
+                <div class="races-grid" id="available-races">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Pending Approval Tab -->
+            <div class="tab-content" id="pending-tab">
+                <div class="races-grid" id="pending-races">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Upcoming Races Tab -->
+            <div class="tab-content" id="upcoming-tab">
+                <div class="races-grid" id="upcoming-races">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trainee Selection Modal -->
+    <div class="modal" id="trainee-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Select Your Trainee</h2>
+                <button class="close-btn" onclick="closeTraineeModal()">×</button>
+            </div>
+            <div class="trainees-list" id="trainees-list">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeTraineeModal()">Cancel</button>
+                <button class="btn btn-primary btn-full" id="confirm-register-btn" disabled onclick="confirmRegistration()">
+                    Register Selected Trainee
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/page-transitions.js"></script>
+    <script src="assets/loading-overlay.js"></script>
+    <script src="assets/notifications.js"></script>
+    <script>
+        let currentRaceId = null;
+        let selectedTraineeId = null;
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                // Update active tab button
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update active tab content
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(`${tab}-tab`).classList.add('active');
+            });
+        });
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAvailableRaces();
+            loadPendingRaces();
+            loadUpcomingRaces();
+            loadTrainees();
+        });
+
+        // Load available races (registration open)
+        async function loadAvailableRaces() {
+            try {
+                const response = await fetchWithLoading('/api/races?status=registration', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load races');
+
+                const races = await response.json();
+                renderAvailableRaces(races);
+            } catch (error) {
+                console.error('Error loading available races:', error);
+                Notifications.error('Failed to load available races');
+            }
+        }
+
+        // Load pending approval races
+        async function loadPendingRaces() {
+            try {
+                const response = await fetchWithLoading('/api/registrations/my-registrations?status=pending', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load registrations');
+
+                const registrations = await response.json();
+                renderPendingRaces(registrations);
+                
+                // Update badge
+                document.getElementById('pending-badge').textContent = registrations.length;
+            } catch (error) {
+                console.error('Error loading pending races:', error);
+                Notifications.error('Failed to load pending registrations');
+            }
+        }
+
+        // Load upcoming races (approved)
+        async function loadUpcomingRaces() {
+            try {
+                const response = await fetchWithLoading('/api/registrations/my-registrations?status=approved', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load races');
+
+                const registrations = await response.json();
+                renderUpcomingRaces(registrations);
+            } catch (error) {
+                console.error('Error loading upcoming races:', error);
+                Notifications.error('Failed to load upcoming races');
+            }
+        }
+
+        // Render available races
+        function renderAvailableRaces(races) {
+            const container = document.getElementById('available-races');
+            
+            if (races.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏁</div>
+                        <div class="empty-title">No Open Races</div>
+                        <div class="empty-text">There are currently no races accepting registrations. Check back later!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = races.map(race => {
+                const capacity = race.current_participants || 0;
+                const maxCapacity = race.max_participants || 16;
+                const capacityPercent = (capacity / maxCapacity) * 100;
+
+                return `
+                    <div class="race-card">
+                        <div class="race-header">
+                            <div>
+                                <div class="race-title">${race.name}</div>
+                            </div>
+                            <span class="race-status status-open">Registration Open</span>
+                        </div>
+
+                        <div class="race-description">
+                            ${race.description || 'No description available.'}
+                        </div>
+
+                        <div class="race-info">
+                            <div class="info-item">
+                                <span class="info-icon">📏</span>
+                                <div>
+                                    <div class="info-label">Distance</div>
+                                    <div>${race.distance}m</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">🏟️</span>
+                                <div>
+                                    <div class="info-label">Surface</div>
+                                    <div>${race.surface || 'Turf'}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">💰</span>
+                                <div>
+                                    <div class="info-label">Prize Pool</div>
+                                    <div>¥${(race.prize_pool || 0).toLocaleString()}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-icon">📅</span>
+                                <div>
+                                    <div class="info-label">Start Time</div>
+                                    <div>${new Date(race.start_time).toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="race-capacity">
+                            <div class="capacity-bar">
+                                <div class="capacity-fill" style="width: ${capacityPercent}%"></div>
+                            </div>
+                            <div class="capacity-text">${capacity}/${maxCapacity}</div>
+                        </div>
+
+                        <div class="race-actions">
+                            <button class="btn btn-primary" onclick="openTraineeModal(${race.id})" ${capacity >= maxCapacity ? 'disabled' : ''}>
+                                Register Trainee
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render pending races
+        function renderPendingRaces(registrations) {
+            const container = document.getElementById('pending-races');
+            
+            if (registrations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⏳</div>
+                        <div class="empty-title">No Pending Registrations</div>
+                        <div class="empty-text">You don't have any registrations awaiting approval.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = registrations.map(reg => `
+                <div class="race-card">
+                    <div class="race-header">
+                        <div>
+                            <div class="race-title">${reg.race.name}</div>
+                        </div>
+                        <span class="race-status status-pending">Pending Approval</span>
+                    </div>
+
+                    <div class="race-info">
+                        <div class="info-item">
+                            <span class="info-icon">📏</span>
+                            <div>
+                                <div class="info-label">Distance</div>
+                                <div>${reg.race.distance}m</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🏟️</span>
+                            <div>
+                                <div class="info-label">Surface</div>
+                                <div>${reg.race.surface || 'Turf'}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">💰</span>
+                            <div>
+                                <div class="info-label">Prize Pool</div>
+                                <div>¥${(reg.race.prize_pool || 0).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">📅</span>
+                            <div>
+                                <div class="info-label">Start Time</div>
+                                <div>${new Date(reg.race.start_time).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="registered-trainee">
+                        <div class="trainee-avatar">🏇</div>
+                        <div class="trainee-info">
+                            <div class="trainee-name">${reg.trainee.name}</div>
+                            <div class="trainee-stats">
+                                <div class="stat-item">
+                                    <span>⭐</span> Level ${reg.trainee.level || 1}
+                                </div>
+                                <div class="stat-item">
+                                    <span>🏆</span> ${reg.trainee.wins || 0} Wins
+                                </div>
+                                <div class="stat-item">
+                                    <span>📊</span> ${((reg.trainee.wins || 0) / (reg.trainee.total_races || 1) * 100).toFixed(1)}% Win Rate
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="race-actions">
+                        <button class="btn btn-danger" onclick="withdrawRegistration(${reg.id})">
+                            Withdraw Registration
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render upcoming races
+        function renderUpcomingRaces(registrations) {
+            const container = document.getElementById('upcoming-races');
+            
+            if (registrations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏇</div>
+                        <div class="empty-title">No Upcoming Races</div>
+                        <div class="empty-text">You don't have any approved race entries yet.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = registrations.map(reg => `
+                <div class="race-card">
+                    <div class="race-header">
+                        <div>
+                            <div class="race-title">${reg.race.name}</div>
+                        </div>
+                        <span class="race-status status-approved">Approved</span>
+                    </div>
+
+                    <div class="race-info">
+                        <div class="info-item">
+                            <span class="info-icon">📏</span>
+                            <div>
+                                <div class="info-label">Distance</div>
+                                <div>${reg.race.distance}m</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🏟️</span>
+                            <div>
+                                <div class="info-label">Surface</div>
+                                <div>${reg.race.surface || 'Turf'}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">💰</span>
+                            <div>
+                                <div class="info-label">Prize Pool</div>
+                                <div>¥${(reg.race.prize_pool || 0).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">📅</span>
+                            <div>
+                                <div class="info-label">Start Time</div>
+                                <div>${new Date(reg.race.start_time).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="registered-trainee">
+                        <div class="trainee-avatar">🏇</div>
+                        <div class="trainee-info">
+                            <div class="trainee-name">${reg.trainee.name}</div>
+                            <div class="trainee-stats">
+                                <div class="stat-item">
+                                    <span>⭐</span> Level ${reg.trainee.level || 1}
+                                </div>
+                                <div class="stat-item">
+                                    <span>🏆</span> ${reg.trainee.wins || 0} Wins
+                                </div>
+                                <div class="stat-item">
+                                    <span>📊</span> ${((reg.trainee.wins || 0) / (reg.trainee.total_races || 1) * 100).toFixed(1)}% Win Rate
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="race-actions">
+                        <button class="btn btn-primary" onclick="viewRaceDetails(${reg.race.id})">
+                            View Race Details
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load trainees for modal
+        let traineesData = [];
+        
+        async function loadTrainees() {
+            try {
+                const response = await fetch('/api/trainees/my-trainees', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load trainees');
+
+                traineesData = await response.json();
+            } catch (error) {
+                console.error('Error loading trainees:', error);
+            }
+        }
+
+        // Open trainee selection modal
+        function openTraineeModal(raceId) {
+            currentRaceId = raceId;
+            selectedTraineeId = null;
+            
+            const modal = document.getElementById('trainee-modal');
+            const list = document.getElementById('trainees-list');
+            
+            if (traineesData.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏇</div>
+                        <div class="empty-title">No Trainees Available</div>
+                        <div class="empty-text">You need to train some Uma Musume first!</div>
+                    </div>
+                `;
+                modal.classList.add('active');
+                return;
+            }
+
+            list.innerHTML = traineesData.map(trainee => `
+                <div class="trainee-card" onclick="selectTrainee(${trainee.id})">
+                    <div class="trainee-card-avatar">🏇</div>
+                    <div class="trainee-card-info">
+                        <div class="trainee-card-name">${trainee.name}</div>
+                        <div class="trainee-card-stats">
+                            <div class="stat-box">
+                                <div class="stat-label">Speed</div>
+                                <div class="stat-value">${trainee.speed || 50}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Stamina</div>
+                                <div class="stat-value">${trainee.stamina || 50}</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Power</div>
+                                <div class="stat-value">${trainee.power || 50}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            modal.classList.add('active');
+        }
+
+        // Close trainee modal
+        function closeTraineeModal() {
+            document.getElementById('trainee-modal').classList.remove('active');
+            currentRaceId = null;
+            selectedTraineeId = null;
+        }
+
+        // Select trainee
+        function selectTrainee(traineeId) {
+            selectedTraineeId = traineeId;
+            
+            // Update UI
+            document.querySelectorAll('.trainee-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.trainee-card').classList.add('selected');
+            
+            // Enable confirm button
+            document.getElementById('confirm-register-btn').disabled = false;
+        }
+
+        // Confirm registration
+        async function confirmRegistration() {
+            if (!currentRaceId || !selectedTraineeId) return;
+
+            try {
+                const response = await fetchWithLoading(`/api/races/${currentRaceId}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        trainee_id: selectedTraineeId
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to register');
+                }
+
+                Notifications.success('Registration submitted! Awaiting admin approval.');
+                
+                closeTraineeModal();
+                loadAvailableRaces();
+                loadPendingRaces();
+            } catch (error) {
+                console.error('Error registering:', error);
+                Notifications.error(error.message);
+            }
+        }
+
+        // Withdraw registration
+        async function withdrawRegistration(registrationId) {
+            if (!confirm('Are you sure you want to withdraw this registration?')) return;
+
+            try {
+                const response = await fetchWithLoading(`/api/registrations/${registrationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to withdraw registration');
+
+                Notifications.success('Registration withdrawn successfully');
+                
+                loadPendingRaces();
+                loadAvailableRaces();
+            } catch (error) {
+                console.error('Error withdrawing:', error);
+                Notifications.error('Failed to withdraw registration');
+            }
+        }
+
+        // View race details
+        function viewRaceDetails(raceId) {
+            navigateTo(`/race-details.html?id=${raceId}`);
+        }
+    </script>
+</body>
+</html>

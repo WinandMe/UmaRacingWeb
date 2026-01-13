@@ -153,6 +153,8 @@
             color: #1565c0;
         }
     </style>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
 </head>
 <body>
     <div class="container">
@@ -187,8 +189,7 @@
     </div>
 
     <script>
-        const API_BASE = "http://localhost:5000/api";
-
+        // API_BASE is defined in api-config.js
         const form = document.getElementById("loginForm");
         const errorMessage = document.getElementById("errorMessage");
         const loading = document.getElementById("loading");
@@ -226,7 +227,7 @@
                     
                     // Redirect to XMB main menu
                     setTimeout(() => {
-                        window.location.href = "main-menu.html";
+                        if (typeof navigateTo === 'function') { navigateTo('main-menu.html'); } else { window.location.href = 'main-menu.html'; }
                     }, 500);
                 } else {
                     errorMessage.textContent = data.detail || "Invalid username or password";
@@ -241,5 +242,7 @@
             }
         });
     </script>
+<script src="assets/loading-overlay.js"></script>
+<script src="assets/page-transitions.js"></script>
 </body>
 </html>

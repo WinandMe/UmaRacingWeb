@@ -94,6 +94,8 @@ class Race(Base):
     surface = Column(String(20), nullable=True)
     race_type = Column(String(50), nullable=True)
     track_condition = Column(String(20), nullable=True)
+    max_participants = Column(Integer, default=12)
+    prize_pool = Column(Integer, default=0)
     scheduled_at = Column(DateTime, nullable=True)
     started_at = Column(DateTime, nullable=True)
     finished_at = Column(DateTime, nullable=True)
@@ -106,7 +108,7 @@ class Race(Base):
     result = relationship("RaceResult", back_populates="race", uselist=False)
 
     __table_args__ = (
-        CheckConstraint("status IN ('scheduled', 'running', 'finished', 'cancelled')"),
+        CheckConstraint("status IN ('scheduled', 'registration', 'ready', 'running', 'finished', 'cancelled')"),
         Index('idx_races_status', 'status'),
         Index('idx_races_scheduled', 'scheduled_at'),
     )

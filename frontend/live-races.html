@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Races - UmalinkedIn</title>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
+    <link rel="stylesheet" href="assets/notifications.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            font-size: 36px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Live Indicator */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ff4757;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Main Content */
+        .race-view {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .race-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .race-title-section {
+            flex: 1;
+        }
+
+        .race-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .race-info-line {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .info-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border-radius: 20px;
+        }
+
+        /* Track Container */
+        .track-container {
+            margin-bottom: 40px;
+            background: linear-gradient(180deg, #8bc34a 0%, #4caf50 100%);
+            border-radius: 12px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .distance-remaining {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-info {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .track-canvas {
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+            background: #1a4d2e;
+            border-radius: 8px;
+            border: 4px solid #8B7355;
+        }
+
+        /* Commentary */
+        .commentary-container {
+            margin-top: 40px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .commentary-header {
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .commentary-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .commentary-item {
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .commentary-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .commentary-text {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .standings-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .standing-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .position-badge {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .position-1 { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; }
+        .position-2 { background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #333; }
+        .position-3 { background: linear-gradient(135deg, #cd7f32 0%, #e8a87c 100%); color: white; }
+
+        .standing-info {
+            flex: 1;
+        }
+
+        .standing-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .standing-trainer {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .standing-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    <span class="header-icon">🏇</span>
+                    Live Races
+                    <span class="live-indicator">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </span>
+                </h1>
+                <button class="back-btn" onclick="navigateTo('/main-menu.html')">
+                    ← Back to Menu
+                </button>
+            </div>
+        </div>
+
+        <!-- Race View -->
+        <div class="race-view" id="race-view">
+            <!-- Content populated by JavaScript -->
+        </div>
+    </div>
+
+    <script src="assets/page-transitions.js"></script>
+    <script src="assets/loading-overlay.js"></script>
+    <script src="assets/notifications.js"></script>
+    <script>
+        let currentRaceId = null;
+        let currentRaceData = null;
+        let updateInterval = null;
+        let trackCanvas = null;
+
+        // Track specs (from race_engine)
+        const trackSpecs = {
+            'Nakayama': { width_ratio: 2.0, corner_tightness: 0.6, dir_mult: 1, distance: 2000 },
+            'Tokyo': { width_ratio: 2.5, corner_tightness: 0.7, dir_mult: 1, distance: 2400 },
+            'Kyoto': { width_ratio: 2.2, corner_tightness: 0.65, dir_mult: -1, distance: 2000 },
+            'Hanshin': { width_ratio: 2.1, corner_tightness: 0.6, dir_mult: -1, distance: 1800 },
+            'Chukyo': { width_ratio: 2.0, corner_tightness: 0.65, dir_mult: 1, distance: 1900 },
+        };
+
+        // Horse colors
+        const horseColors = [
+            '#ff6b6b', '#4ecdc4', '#45b7d1', '#ffd93d',
+            '#ff8c42', '#a8e6cf', '#ff8b9d', '#c7ceea'
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLiveRaces();
+            updateInterval = setInterval(() => {
+                if (currentRaceId) {
+                    updateRaceData(currentRaceId);
+                }
+            }, 1000);  // Update every second
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (updateInterval) clearInterval(updateInterval);
+        });
+
+        async function loadLiveRaces() {
+            try {
+                const response = await fetch('/api/races?status=running', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load races');
+
+                const races = await response.json();
+
+                if (races.length === 0) {
+                    showEmptyState();
+                } else {
+                    loadRace(races[0].id);
+                }
+            } catch (error) {
+                console.error('Error loading live races:', error);
+                showEmptyState();
+            }
+        }
+
+        async function loadRace(raceId) {
+            currentRaceId = raceId;
+            await updateRaceData(raceId);
+        }
+
+        async function updateRaceData(raceId) {
+            try {
+                const response = await fetch(`/api/races/${raceId}/live`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to load race data');
+
+                currentRaceData = await response.json();
+                renderRaceView(currentRaceData);
+            } catch (error) {
+                console.error('Error updating race data:', error);
+            }
+        }
+
+        function renderRaceView(data) {
+            const race = data.race;
+            const runners = data.runners || [];
+            const commentary = data.commentary || [];
+
+            const progress = ((race.distance - data.distance_remaining) / race.distance) * 100;
+
+            document.getElementById('race-view').innerHTML = `
+                <div class="race-header">
+                    <div class="race-title-section">
+                        <div class="race-title">${race.name}</div>
+                        <div class="race-info-line">
+                            <div class="info-chip">
+                                <span>📏</span>
+                                <span>${race.distance}m</span>
+                            </div>
+                            <div class="info-chip">
+                                <span>🏟️</span>
+                                <span>${race.surface || 'Turf'}</span>
+                            </div>
+                            <div class="info-chip">
+                                <span>🏇</span>
+                                <span>${runners.length} Runners</span>
+                            </div>
+                            <div class="info-chip">
+                                <span>💰</span>
+                                <span>¥${(race.prize_pool || 0).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="track-container">
+                    <div class="track-header">
+                        <div class="distance-remaining">${data.distance_remaining}m</div>
+                        <div class="progress-info">${progress.toFixed(1)}% Complete</div>
+                    </div>
+                    <svg id="race-track" class="track-canvas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+                        <!-- Track will be rendered here -->
+                    </svg>
+                </div>
+
+                <div class="standings-grid">
+                    ${runners.map((runner, index) => `
+                        <div class="standing-item">
+                            <div class="position-badge position-${index + 1 <= 3 ? index + 1 : ''}">
+                                ${index + 1}
+                            </div>
+                            <div class="standing-info">
+                                <div class="standing-name">${runner.trainee?.name || 'Unknown'}</div>
+                                <div class="standing-trainer">Trainer: ${runner.trainer?.username || 'Unknown'}</div>
+                            </div>
+                            <div class="standing-stats">
+                                <div class="stat">
+                                    <span>💨</span>
+                                    <span>${runner.current_speed?.toFixed(1) || '0.0'} m/s</span>
+                                </div>
+                                <div class="stat">
+                                    <span>⏱️</span>
+                                    <span>${formatTime(runner.elapsed_time || 0)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="commentary-container">
+                    <div class="commentary-header">
+                        <span>📢</span>
+                        Live Commentary
+                    </div>
+                    <div class="commentary-list">
+                        ${commentary.length === 0 ? `
+                            <div class="commentary-item">
+                                <div class="commentary-text">Race is underway! Runners are settling into their positions...</div>
+                            </div>
+                        ` : commentary.map(comment => `
+                            <div class="commentary-item">
+                                <div class="commentary-time">${formatCommentaryTime(comment.timestamp)}</div>
+                                <div class="commentary-text">${comment.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Draw track after DOM is updated
+            drawRaceTrack(data.runners || []);
+
+            // Show milestone notifications
+            if (data.milestone) {
+                Notifications.raceMilestone(data.milestone);
+            }
+        }
+
+        function drawRaceTrack(runners) {
+            const svg = document.getElementById('race-track');
+            if (!svg) return;
+
+            const canvasWidth = 1000;
+            const canvasHeight = 600;
+            const padding = 40;
+            const track = trackSpecs['Nakayama'] || trackSpecs['Tokyo'];
+
+            // Generate track
+            const trackArea = {
+                width: canvasWidth - 2 * padding,
+                height: canvasHeight - 2 * padding,
+            };
+
+            const canvas_ratio = trackArea.width / trackArea.height;
+            const width_ratio = track.width_ratio;
+
+            let oval_width, oval_height;
+            if (canvas_ratio > width_ratio) {
+                oval_height = trackArea.height;
+                oval_width = oval_height * width_ratio;
+            } else {
+                oval_width = trackArea.width;
+                oval_height = oval_width / width_ratio;
+            }
+
+            const cx = canvasWidth / 2;
+            const cy = canvasHeight / 2;
+
+            // Generate track path
+            const trackPoints = [];
+            const numPoints = 500;
+            const corner_radius = (oval_height / 2) * track.corner_tightness;
+            const straight_length = Math.max(0, oval_width - 2 * corner_radius);
+            const left_center_x = cx - straight_length / 2;
+            const right_center_x = cx + straight_length / 2;
+            const top_y = cy - corner_radius;
+            const bottom_y = cy + corner_radius;
+
+            for (let i = 0; i < numPoints; i++) {
+                const t = i / numPoints;
+                let x, y;
+
+                if (track.dir_mult > 0) {
+                    if (t < 0.25) {
+                        const local_t = t / 0.25;
+                        x = left_center_x + local_t * straight_length;
+                        y = top_y;
+                    } else if (t < 0.5) {
+                        const local_t = (t - 0.25) / 0.25;
+                        const angle = -Math.PI / 2 + local_t * Math.PI;
+                        x = right_center_x + corner_radius * Math.cos(angle);
+                        y = cy + corner_radius * Math.sin(angle);
+                    } else if (t < 0.75) {
+                        const local_t = (t - 0.5) / 0.25;
+                        x = right_center_x - local_t * straight_length;
+                        y = bottom_y;
+                    } else {
+                        const local_t = (t - 0.75) / 0.25;
+                        const angle = Math.PI / 2 + local_t * Math.PI;
+                        x = left_center_x + corner_radius * Math.cos(angle);
+                        y = cy + corner_radius * Math.sin(angle);
+                    }
+                } else {
+                    if (t < 0.25) {
+                        const local_t = t / 0.25;
+                        x = right_center_x - local_t * straight_length;
+                        y = top_y;
+                    } else if (t < 0.5) {
+                        const local_t = (t - 0.25) / 0.25;
+                        const angle = -Math.PI / 2 - local_t * Math.PI;
+                        x = left_center_x + corner_radius * Math.cos(angle);
+                        y = cy + corner_radius * Math.sin(angle);
+                    } else if (t < 0.75) {
+                        const local_t = (t - 0.5) / 0.25;
+                        x = left_center_x + local_t * straight_length;
+                        y = bottom_y;
+                    } else {
+                        const local_t = (t - 0.75) / 0.25;
+                        const angle = Math.PI / 2 - local_t * Math.PI;
+                        x = right_center_x + corner_radius * Math.cos(angle);
+                        y = cy + corner_radius * Math.sin(angle);
+                    }
+                }
+
+                trackPoints.push({ x, y, t });
+            }
+
+            // Clear SVG
+            svg.innerHTML = '';
+
+            // Draw track outline
+            let pathData = `M ${trackPoints[0].x} ${trackPoints[0].y}`;
+            for (let i = 1; i < trackPoints.length; i++) {
+                pathData += ` L ${trackPoints[i].x} ${trackPoints[i].y}`;
+            }
+            pathData += ' Z';
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', '#8B7355');
+            path.setAttribute('stroke-width', '3');
+            svg.appendChild(path);
+
+            // Draw inner grass
+            const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            ellipse.setAttribute('cx', cx);
+            ellipse.setAttribute('cy', cy);
+            ellipse.setAttribute('rx', oval_width / 2.3);
+            ellipse.setAttribute('ry', oval_height / 2.3);
+            ellipse.setAttribute('fill', '#1a4d2e');
+            ellipse.setAttribute('opacity', '0.6');
+            svg.appendChild(ellipse);
+
+            // Draw horses
+            runners.forEach((runner, idx) => {
+                const progress = Math.min(1, runner.distance / currentRaceData.race.distance);
+                const trackIndex = Math.floor(progress * (trackPoints.length - 1));
+                const nextIndex = Math.min(trackIndex + 1, trackPoints.length - 1);
+                const t_frac = progress * (trackPoints.length - 1) - trackIndex;
+
+                const p1 = trackPoints[trackIndex];
+                const p2 = trackPoints[nextIndex];
+
+                const x = p1.x + (p2.x - p1.x) * t_frac;
+                const y = p1.y + (p2.y - p1.y) * t_frac;
+
+                // Draw horse circle
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', '8');
+                circle.setAttribute('fill', horseColors[idx % horseColors.length]);
+                circle.setAttribute('stroke', idx < 3 ? '#FFD700' : '#FFFFFF');
+                circle.setAttribute('stroke-width', '2');
+                svg.appendChild(circle);
+
+                // Draw position number
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x);
+                text.setAttribute('y', y + 3);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('fill', '#000');
+                text.setAttribute('font-size', '10');
+                text.setAttribute('font-weight', 'bold');
+                text.textContent = idx + 1;
+                svg.appendChild(text);
+            });
+
+            // Draw finish line
+            const finishGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            const finishCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            finishCircle.setAttribute('cx', trackPoints[0].x);
+            finishCircle.setAttribute('cy', trackPoints[0].y);
+            finishCircle.setAttribute('r', '15');
+            finishCircle.setAttribute('fill', 'none');
+            finishCircle.setAttribute('stroke', '#FFD700');
+            finishCircle.setAttribute('stroke-width', '2');
+            finishCircle.setAttribute('stroke-dasharray', '5,5');
+            finishGroup.appendChild(finishCircle);
+
+            const finishText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            finishText.setAttribute('x', trackPoints[0].x);
+            finishText.setAttribute('y', trackPoints[0].y - 20);
+            finishText.setAttribute('text-anchor', 'middle');
+            finishText.setAttribute('fill', '#FFD700');
+            finishText.setAttribute('font-size', '14');
+            finishText.setAttribute('font-weight', 'bold');
+            finishText.textContent = '🏁';
+            finishGroup.appendChild(finishText);
+
+            svg.appendChild(finishGroup);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            const ms = Math.floor((seconds % 1) * 1000);
+            return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+        }
+
+        function formatCommentaryTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString();
+        }
+
+        function showEmptyState() {
+            document.getElementById('race-view').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🏁</div>
+                    <div class="empty-title">No Live Races</div>
+                    <div class="empty-text">There are no races running at the moment. Check back later!</div>
+                    <button class="btn-primary" onclick="navigateTo('/races.html')">
+                        View Past Results
+                    </button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
