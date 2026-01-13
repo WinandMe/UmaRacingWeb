@@ -47,6 +47,7 @@ allowed_origins = [
     "http://localhost:3000",
     "http://localhost:5173",
     "http://localhost:5500",
+    "https://uma-racing-web.vercel.app/",
 ]
 
 # Add frontend URL from environment if set
