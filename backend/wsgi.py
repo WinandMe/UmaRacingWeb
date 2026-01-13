@@ -2,7 +2,7 @@
 
 import os
 import sys
-from asgiref.wsgi import ASGItoWSGI
+from a2wsgi import ASGIMiddleware
 
 # Add your project directory to the sys.path
 project_home = '/home/YOUR_USERNAME/UmaRacingWeb/backend'
@@ -16,5 +16,5 @@ os.environ.setdefault('ENVIRONMENT', 'production')
 # Import your FastAPI app (ASGI)
 from main import app
 
-# Wrap ASGI app for WSGI server
-application = ASGItoWSGI(app)
+# Wrap ASGI app for WSGI server using a2wsgi
+application = ASGIMiddleware(app)
