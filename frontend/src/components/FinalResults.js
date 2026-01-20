@@ -345,7 +345,11 @@ const FinalResults = ({ raceData, configData, onReturnHome }) => {
           💾 Save Result as TXT
         </motion.button>
         <motion.button
-          onClick={onReturnHome}
+          onClick={() => {
+            onReturnHome();
+            // Refresh page to clear state and go back to main menu
+            setTimeout(() => window.location.reload(), 300);
+          }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="flex-1 px-6 py-3 bg-primary hover:bg-purple-700 rounded-lg font-semibold text-lg"

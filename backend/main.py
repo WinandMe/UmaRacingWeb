@@ -2,15 +2,19 @@
 FastAPI backend for Uma Racing Simulator
 WebSocket for real-time race updates
 REST API for configuration and results
+
+Authentication: URS-API-2026-WMIRQ-BACKEND
+Authors: WinandMe, Ilfaust-Rembrandt
+Created by: WinandMe (Safi) & Ilfaust-Rembrandt (Quaggy)
 """
 
-from fastapi import FastAPI, File, UploadFile, WebSocket, HTTPException, Depends
+from fastapi import FastAPI, File, UploadFile, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import json
 import asyncio
-from typing import Dict, List, Optional
+from typing import Dict, List
 import os
 import sys
 import traceback as tb
@@ -29,8 +33,6 @@ sys.excepthook = handle_exception
 from app.models.race import RaceConfig, RaceFrame, RaceResult, ParticipantStats
 from app.services.race_service import race_service
 from app.races import G1_RACES, G2_RACES, G3_RACES, INTERNATIONAL_RACES, Racecourse, Surface
-from app.db import init_db
-from app.routes import auth, stats, admin, races, chat, friends, dms, umalinkedin, umalinkedin_posts
 
 # Import skills from skills.py (in backend root)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -38,68 +40,48 @@ from skills import SKILLS_DATABASE
 
 app = FastAPI(
     title="Uma Racing Simulator API",
-    description="Real-time horse racing simulation engine with multiplayer stats and racing",
-    version="2.0.0"
+    description="Real-time horse racing simulation engine",
+    version="1.0.0"
 )
 
-# Enable CORS for React/HTML frontend
-allowed_origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://localhost:5500",
-    "https://uma-racing-web.vercel.app/",
-]
+# Copyright Notice - Displayed on startup
+print("\n" + "="*70)
+print("  Uma Racing Simulator - Backend Server")
+print("  Created by WinandMe & Ilfaust-Rembrandt")
+print("  Fan project for Uma Musume Pretty Derby (© Cygames)")
+print("  Please respect our work and give credit if you use it! 💙")
+print("="*70 + "\n")
 
-# Add frontend URL from environment if set
-frontend_url = os.getenv("FRONTEND_URL")
-if frontend_url and frontend_url not in allowed_origins:
-    allowed_origins.append(frontend_url)
-
-# In production, restrict CORS. In development, allow all for testing
-if os.getenv("ENVIRONMENT") == "production":
-    # For Vercel: add your actual frontend URL here
-    pass
-else:
-    allowed_origins.append("*")
-
+# Enable CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize database on startup
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database on application startup"""
-    print("\n" + "="*60)
-    print("Uma Racing Web - Backend Starting...")
-    print("="*60)
-    try:
-        init_db()
-        print("[OK] Database initialized successfully")
-    except Exception as e:
-        print(f"[ERROR] Database initialization error: {e}")
-        import traceback
-        traceback.print_exc()
-        # Don't raise - let the server keep running
-        pass
-
-# Include API routes
-app.include_router(auth.router)
-app.include_router(stats.router)
-app.include_router(admin.router)
-app.include_router(races.router)
-app.include_router(chat.router)
-app.include_router(friends.router)
-app.include_router(dms.router)
-app.include_router(umalinkedin.router)
-app.include_router(umalinkedin_posts.router)
-
 # Store WebSocket connections
 active_connections: Dict[str, WebSocket] = {}
+
+# ============ VERIFICATION ENDPOINT ============
+
+@app.get("/api/verify-integrity")
+async def verify_integrity():
+    """Verify code integrity by checking authentication signatures"""
+    try:
+        from verify_integrity import check_critical_signatures
+        result = check_critical_signatures()
+        return result
+    except Exception as e:
+        return {
+            'authentic': False,
+            'signatures_found': 0,
+            'signatures_expected': 3,
+            'checked_files': [],
+            'missing_signatures': ['verification error'],
+            'message': f'Verification error: {str(e)}'
+        }
 
 # ============ REST ENDPOINTS ============
 
@@ -325,82 +307,6 @@ async def set_race_speed(speed_multiplier: float = 1.0):
 
 # ============ WEBSOCKET FOR REAL-TIME UPDATES ============
 
-# ============ LIVE RACE ENDPOINTS ============
-
-@app.post("/api/races/{race_id}/start")
-async def start_race(race_id: int):
-    """Start a race simulation"""
-    try:
-        result = await race_service.start_race(None, race_id)
-        if result is None:
-            raise HTTPException(status_code=400, detail="Race cannot be started")
-        return {"status": "success", "race": result}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.get("/api/races/{race_id}/live")
-async def get_live_race(race_id: int, frame_index: Optional[int] = None):
-    """Get current live race data"""
-    data = await race_service.get_live_race_data(race_id, frame_index)
-    if data is None:
-        raise HTTPException(status_code=404, detail="Race not found or not running")
-    return data
-
-@app.post("/api/races/{race_id}/frame")
-async def get_next_frame(race_id: int):
-    """Simulate and get next race frame"""
-    try:
-        frame = await race_service.simulate_race_frame(None, race_id)
-        if frame is None:
-            raise HTTPException(status_code=400, detail="Race not running")
-        return frame
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.post("/api/races/{race_id}/finish")
-async def finish_race(race_id: int):
-    """Finish a race"""
-    try:
-        result = await race_service.finish_race(None, race_id)
-        if result is None:
-            raise HTTPException(status_code=404, detail="Race not found")
-        return {"status": "success", "race": result}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.get("/api/races/{race_id}/registrations")
-async def get_race_registrations(race_id: int, status: Optional[str] = None):
-    """Get registrations for a race"""
-    try:
-        regs = await race_service.get_registrations(None, race_id, status)
-        return {"registrations": regs}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.post("/api/races/{race_id}/open-registration")
-async def open_race_registration(race_id: int):
-    """Open registration for a race"""
-    try:
-        race = await race_service.open_registration(None, race_id)
-        if race is None:
-            raise HTTPException(status_code=400, detail="Race cannot open registration")
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.post("/api/races/{race_id}/close-registration")
-async def close_race_registration(race_id: int):
-    """Close registration for a race"""
-    try:
-        race = await race_service.close_registration(None, race_id)
-        if race is None:
-            raise HTTPException(status_code=400, detail="Race cannot close registration")
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-# ============ WEBSOCKET ============
-
 @app.websocket("/ws/race/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: str):
     """WebSocket endpoint for real-time race frame updates"""
@@ -469,33 +375,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "service": "Uma Racing Simulator API v2.0"}
-
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "service": "Uma Racing Web API",
-        "version": "2.0.0",
-        "documentation": "/docs",
-        "endpoints": {
-            "racing": "/api/races",
-            "authentication": "/api/auth",
-            "stats": "/api/stats",
-            "admin": "/api/admin",
-            "chat": "/api/chat",
-            "friends": "/api/friends",
-            "dms": "/api/dms"
-        }
-    }
+    return {"status": "healthy", "service": "Uma Racing Simulator API"}
 
 if __name__ == "__main__":
     import uvicorn
-    print("\n" + "="*60)
-    print("Uma Racing Web - Starting Backend Server")
-    print("="*60)
-    print("\n[INFO] API Server:     http://localhost:5000")
-    print("[INFO] API Docs:       http://localhost:5000/docs")
-    print("[INFO] Frontend:       http://localhost:5500 (if using Live Server)")
-    print("\n" + "="*60)
     uvicorn.run(app, host="0.0.0.0", port=5000)

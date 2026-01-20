@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderation Tools - Uma Racing Web</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .navbar {
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+        }
+        .navbar-brand {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover { background: rgba(102, 126, 234, 0.3); }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 32px; font-weight: 700; margin-bottom: 20px; }
+        .moderation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .mod-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        .mod-card:hover { background: rgba(102, 126, 234, 0.1); }
+        .mod-icon { font-size: 32px; margin-bottom: 10px; }
+        .mod-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+        .mod-description { font-size: 13px; color: rgba(255, 255, 255, 0.6); margin-bottom: 15px; }
+        .mod-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .mod-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
+        .mod-btn.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        .violations-table {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        tbody tr:hover { background: rgba(102, 126, 234, 0.05); }
+        .violation-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover { background: rgba(102, 126, 234, 0.2); }
+    </style>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand">🔨 Moderation Tools</div>
+        <div class="navbar-buttons">
+            <button class="nav-btn" onclick="navigateTo('/admin-users.html')">Administration Hub</button>
+            <button class="nav-btn" onclick="navigateTo('/main-menu.html')">Main Menu</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Moderation Tools</h1>
+            <p style="color: rgba(255, 255, 255, 0.6); margin-top: 10px;">Manage reports, bans, and violations</p>
+        </div>
+
+        <!-- Moderation Actions -->
+        <div class="moderation-grid">
+            <div class="mod-card">
+                <div class="mod-icon">🚫</div>
+                <div class="mod-title">Ban User</div>
+                <div class="mod-description">Prevent a user from accessing the platform</div>
+                <button class="mod-btn danger" onclick="banUser()">Ban User</button>
+            </div>
+
+            <div class="mod-card">
+                <div class="mod-icon">⏱️</div>
+                <div class="mod-title">Temporary Ban</div>
+                <div class="mod-description">Restrict user access for a set period</div>
+                <button class="mod-btn" onclick="tempBan()">Apply Ban</button>
+            </div>
+
+            <div class="mod-card">
+                <div class="mod-icon">📝</div>
+                <div class="mod-title">Warning</div>
+                <div class="mod-description">Issue a formal warning to a user</div>
+                <button class="mod-btn" onclick="issueWarning()">Issue Warning</button>
+            </div>
+
+            <div class="mod-card">
+                <div class="mod-icon">🔍</div>
+                <div class="mod-title">Review Reports</div>
+                <div class="mod-description">View and process user reports</div>
+                <button class="mod-btn" onclick="reviewReports()">View Reports</button>
+            </div>
+
+            <div class="mod-card">
+                <div class="mod-icon">📢</div>
+                <div class="mod-title">Announcements</div>
+                <div class="mod-description">Send system-wide announcements</div>
+                <button class="mod-btn" onclick="postAnnouncement()">Post</button>
+            </div>
+
+            <div class="mod-card">
+                <div class="mod-icon">📊</div>
+                <div class="mod-title">Moderation Log</div>
+                <div class="mod-description">View all moderation actions taken</div>
+                <button class="mod-btn" onclick="viewLog()">View Log</button>
+            </div>
+        </div>
+
+        <!-- Recent Violations -->
+        <h2 style="margin: 30px 0 20px;">Recent Violations</h2>
+        <div class="violations-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Violation Type</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="violationsBody">
+                    <!-- Violations will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="assets/api-config.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let violations = [];
+
+        async function init() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Not authenticated');
+                const user = await response.json();
+                if (user.role !== 'admin') {
+                    alert('Only admins can access this page');
+                    window.location.href = '/main-menu.html';
+                }
+                loadViolations();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        function loadViolations() {
+            violations = [
+                { user: 'user123', type: 'Inappropriate Language', date: '2025-01-10', status: 'Warned' },
+                { user: 'spammer99', type: 'Spam', date: '2025-01-08', status: 'Suspended' },
+                { user: 'cheater42', type: 'Cheating', date: '2025-01-05', status: 'Banned' }
+            ];
+            renderViolations();
+        }
+
+        function renderViolations() {
+            const tbody = document.getElementById('violationsBody');
+            tbody.innerHTML = violations.map(v => `
+                <tr>
+                    <td>${v.user}</td>
+                    <td><span class="violation-badge">${v.type}</span></td>
+                    <td>${v.date}</td>
+                    <td>${v.status}</td>
+                    <td>
+                        <button class="action-btn" onclick="viewViolation('${v.user}')">Review</button>
+                        <button class="action-btn" onclick="resolveViolation('${v.user}')">Resolve</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function banUser() {
+            const user = prompt('Enter username to ban:');
+            if (user) alert(`User ${user} has been banned!`);
+        }
+
+        function tempBan() {
+            const user = prompt('Enter username:');
+            if (user) {
+                const days = prompt('Ban duration (days):');
+                if (days) alert(`User ${user} banned for ${days} days!`);
+            }
+        }
+
+        function issueWarning() {
+            const user = prompt('Enter username:');
+            if (user) alert(`Warning issued to ${user}!`);
+        }
+
+        function reviewReports() {
+            alert('Viewing all user reports...');
+        }
+
+        function postAnnouncement() {
+            const msg = prompt('Enter announcement:');
+            if (msg) alert(`Announcement posted: ${msg}`);
+        }
+
+        function viewLog() {
+            alert('Displaying moderation log...');
+        }
+
+        function viewViolation(user) {
+            alert(`Reviewing violation for ${user}...`);
+        }
+
+        function resolveViolation(user) {
+            alert(`Violation for ${user} marked as resolved!`);
+            loadViolations();
+        }
+
+        init();
+    </script>
+<script src="assets/loading-overlay.js"></script>
+<script src="assets/page-transitions.js"></script>
+</body>
+</html>

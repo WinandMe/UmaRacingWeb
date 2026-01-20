@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UmaLinkedIn - Professional Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f3f2ef;
+            color: #000;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #e1e1e1;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .nav-content {
+            max-width: 1128px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0a66c2;
+            text-decoration: none;
+        }
+
+        .nav-search {
+            flex: 1;
+            max-width: 300px;
+            margin: 0 20px;
+        }
+
+        .nav-search input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid #ccc;
+            border-radius: 24px;
+            background-color: #eef3f8;
+            font-size: 14px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a, .nav-links button {
+            text-decoration: none;
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .nav-links button.logout {
+            color: #d63031;
+        }
+
+        .container {
+            max-width: 1128px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e1e1e1;
+            text-align: center;
+        }
+
+        .profile-banner {
+            height: 60px;
+            background: linear-gradient(135deg, #0a66c2, #004182);
+            border-radius: 8px 8px 0 0;
+            margin: -16px -16px 16px -16px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: -40px auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 4px solid white;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .profile-title {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding-top: 16px;
+            border-top: 1px solid #e1e1e1;
+            margin-top: 16px;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 8px 0;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .post-composer {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .composer-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .composer-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .composer-input-area {
+            flex: 1;
+        }
+
+        .composer-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e1e1e1;
+            border-radius: 24px;
+            background-color: #f3f2ef;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .composer-input:hover {
+            background-color: #e8e7e1;
+        }
+
+        .composer-input:focus {
+            outline: none;
+            background-color: white;
+            border-color: #0a66c2;
+        }
+
+        .composer-toolbar {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e1e1e1;
+            justify-content: flex-end;
+        }
+
+        .composer-toolbar button {
+            background: none;
+            border: none;
+            color: #0a66c2;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .composer-toolbar button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .post {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .post:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .post-header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .post-author {
+            display: flex;
+            gap: 12px;
+        }
+
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-name {
+            font-weight: 600;
+            font-size: 14px;
+            display: block;
+            color: #000;
+        }
+
+        .post-title {
+            font-size: 12px;
+            color: #666;
+            display: block;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: #999;
+            display: block;
+        }
+
+        .post-menu {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .post-content {
+            padding: 0 16px 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #000;
+        }
+
+        .post-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid #e1e1e1;
+            gap: 1px;
+            background-color: #e1e1e1;
+            margin: 8px 0 0;
+        }
+
+        .post-action {
+            background: white;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .post-action:hover {
+            background-color: #f3f2ef;
+            color: #0a66c2;
+        }
+
+        .post-action.active {
+            color: #0a66c2;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #e1e1e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group button {
+            background: #0a66c2;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .form-group button:hover {
+            background: #004182;
+        }
+
+        .right-sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .widget {
+            background: white;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .widget-header {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .widget-item {
+            padding: 8px 0;
+            font-size: 14px;
+            color: #0a66c2;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .widget-item:hover {
+            text-decoration: underline;
+            color: #004182;
+        }
+
+        .comments-section {
+            margin-top: 16px;
+            padding: 16px;
+            background-color: #f9f9f9;
+        }
+
+        .comment {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .comment:last-child {
+            border-bottom: none;
+        }
+
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .comment-text {
+            font-size: 13px;
+            margin-top: 4px;
+            color: #000;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .comment-action {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .comment-action:hover {
+            color: #0a66c2;
+        }
+
+        .add-comment {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e1e1e1;
+        }
+
+        .add-comment input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 16px;
+            font-size: 13px;
+        }
+
+        .add-comment button {
+            background: #0a66c2;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-weight: 600;
+        }
+
+        .add-comment button:hover {
+            background: #004182;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr 300px;
+            }
+
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .right-sidebar {
+                display: none;
+            }
+
+            .nav-search {
+                display: none;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+</head>
+<body>
+    <script src="assets/api-config.js"></script>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="umalinkedin.html" class="logo">💼 UmaLinkedIn</a>
+            <div class="nav-search">
+                <input type="text" placeholder="🔍 Search...">
+            </div>
+            <div class="nav-links">
+                <a href="umalinkedin.html">🏠<br>Home</a>
+                <a href="#">👥<br>Network</a>
+                <a href="#">💼<br>Jobs</a>
+                <a href="#">💬<br>Messages</a>
+                <a href="#">🔔<br>Notifications</a>
+                <a href="main-menu.html">🎮<br>Main Menu</a>
+                <button class="logout" onclick="window.location.href='login.html'">🚪<br>Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="profile-banner"></div>
+                <div class="profile-avatar">🏇</div>
+                <div class="profile-name" id="userProfileName">Trainer Name</div>
+                <div class="profile-title">Uma Musume Trainer</div>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-value">27</div>
+                        <div class="stat-label">Connections</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget">
+                <div class="widget-header">🔥 Trending</div>
+                <div class="widget-item" onclick="search('Arima Kinen')">#ArimaKinen</div>
+                <div class="widget-item" onclick="search('Championship')">#Championship</div>
+                <div class="widget-item" onclick="search('Racing')">#Racing</div>
+                <div class="widget-item" onclick="search('Uma Musume')">#UmaMusume</div>
+            </div>
+        </div>
+
+        <div class="feed">
+            <div class="post-composer">
+                <div class="composer-header">
+                    <div class="composer-avatar">🏇</div>
+                    <div class="composer-input-area">
+                        <input class="composer-input" placeholder="Start a post..." onclick="openPostModal()" readonly>
+                    </div>
+                </div>
+                <div class="composer-toolbar">
+                    <button title="Add Image" onclick="openPostModal()">🖼️</button>
+                    <button title="Add Video" onclick="openPostModal()">🎥</button>
+                    <button title="Poll" onclick="openPostModal()">📊</button>
+                    <button title="Schedule" onclick="openPostModal()">⏰</button>
+                </div>
+            </div>
+
+            <div id="feedContainer"></div>
+        </div>
+
+        <div class="right-sidebar">
+            <div class="widget">
+                <div class="widget-header">💡 Did you know?</div>
+                <p style="font-size: 13px; color: #666;">Special Week has won 15 races this season! Follow her trainer for exclusive updates.</p>
+            </div>
+
+            <div class="widget">
+                <div class="widget-header">🎯 Suggestions</div>
+                <div class="widget-item">Connect with Top Trainers</div>
+                <div class="widget-item">Join Racing Community</div>
+                <div class="widget-item">Discover Techniques</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="postModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">✍️ Create a post</div>
+                <button class="modal-close" onclick="closePostModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>What's on your mind?</label>
+                    <textarea id="postContent" placeholder="Share your thoughts..."></textarea>
+                </div>
+                <div class="form-group">
+                    <button onclick="publishPost()">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API_BASE is defined in api-config.js
+        let posts = [];
+        let currentUser = null;
+
+        async function initFeed() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                currentUser = await response.json();
+                document.getElementById('userProfileName').textContent = currentUser.username;
+                await loadPosts();
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function loadPosts() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/posts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    posts = data.map(p => ({
+                        ...p,
+                        showComments: false,
+                        comments_list: []
+                    }));
+                }
+                renderFeed();
+            } catch (error) {
+                console.error('Failed to load posts:', error);
+            }
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('feedContainer');
+            if (posts.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #666;"><div style="font-size: 48px; margin-bottom: 16px;">💼</div><h3>No posts yet</h3><p>Be the first to share something!</p></div>';
+                return;
+            }
+            container.innerHTML = posts.map(post => `
+                <div class="post">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <div class="post-avatar">${post.avatar}</div>
+                            <div class="post-info">
+                                <span class="post-name">${post.author}</span>
+                                <span class="post-title">${post.title}</span>
+                                <span class="post-time">${post.time}</span>
+                            </div>
+                        </div>
+                        <button class="post-menu">⋯</button>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    <div class="post-actions">
+                        <button class="post-action ${post.liked ? 'active' : ''}" onclick="toggleLike(${post.id})">
+                            ${post.liked ? '❤️' : '👍'} ${post.likes}
+                        </button>
+                        <button class="post-action ${post.showComments ? 'active' : ''}" onclick="toggleComments(${post.id})">
+                            💬 ${post.comments}
+                        </button>
+                        <button class="post-action ${post.reposted ? 'active' : ''}" onclick="repost(${post.id})">
+                            🔄 ${post.reposts}
+                        </button>
+                        <button class="post-action" onclick="sharePost(${post.id})">
+                            ↗️ Share
+                        </button>
+                    </div>
+                    ${post.showComments ? renderComments(post) : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderComments(post) {
+            return `
+                <div class="comments-section">
+                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 12px;">Comments (${post.comments})</div>
+                    ${post.comments_list.map(comment => `
+                        <div class="comment">
+                            <div class="comment-avatar">${comment.avatar}</div>
+                            <div class="comment-content">
+                                <div class="comment-author">${comment.author}</div>
+                                <div class="comment-text">${comment.text}</div>
+                                <div class="comment-time">${comment.time}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                    <div class="add-comment">
+                        <input type="text" id="commentInput${post.id}" placeholder="Write a comment...">
+                        <button onclick="addComment(${post.id})">Post</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function toggleComments(postId) {
+            const post = posts.find(p => p.id === postId);
+            post.showComments = !post.showComments;
+            
+            if (post.showComments && post.comments_list.length === 0) {
+                await loadComments(postId);
+            }
+            renderFeed();
+        }
+
+        async function loadComments(postId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/posts/${postId}/comments`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const comments = await response.json();
+                    const post = posts.find(p => p.id === postId);
+                    post.comments_list = comments;
+                }
+            } catch (error) {
+                console.error('Failed to load comments:', error);
+            }
+        }
+
+        async function toggleLike(postId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const post = posts.find(p => p.id === postId);
+                    post.liked = data.liked;
+                    post.likes += data.liked ? 1 : -1;
+                    renderFeed();
+                }
+            } catch (error) {
+                console.error('Failed to toggle like:', error);
+            }
+        }
+
+        async function repost(postId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/posts/${postId}/repost`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const post = posts.find(p => p.id === postId);
+                    post.reposted = data.reposted;
+                    post.reposts += data.reposted ? 1 : -1;
+                    alert(data.message);
+                    renderFeed();
+                }
+            } catch (error) {
+                console.error('Failed to repost:', error);
+            }
+        }
+
+        function sharePost(postId) {
+            alert('Share post to:\n📧 Email\n💬 Messages\n🔗 Copy link\n📱 Other platforms');
+        }
+
+        async function addComment(postId) {
+            const input = document.getElementById(`commentInput${postId}`);
+            const text = input.value.trim();
+            
+            if (!text) {
+                alert('Please write a comment!');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/posts/${postId}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+                
+                if (response.ok) {
+                    const comment = await response.json();
+                    const post = posts.find(p => p.id === postId);
+                    post.comments_list.push(comment);
+                    post.comments += 1;
+                    input.value = '';
+                    renderFeed();
+                }
+            } catch (error) {
+                console.error('Failed to add comment:', error);
+                alert('Failed to add comment');
+            }
+        }
+
+        function search(term) {
+            alert(`🔍 Searching for "${term}"...`);
+        }
+
+        function openPostModal() {
+            document.getElementById('postModal').classList.add('active');
+            document.getElementById('postContent').focus();
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.remove('active');
+        }
+
+        async function publishPost() {
+            const content = document.getElementById('postContent').value.trim();
+            if (!content) {
+                alert('Please write something!');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_BASE}/umalinkedin/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content })
+                });
+
+                if (response.ok) {
+                    closePostModal();
+                    document.getElementById('postContent').value = '';
+                    await loadPosts();
+                    alert('✓ Post published successfully!');
+                } else {
+                    alert('Failed to publish post');
+                }
+            } catch (error) {
+                console.error('Failed to publish post:', error);
+                alert('Failed to publish post');
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('postModal');
+            if (event.target === modal) {
+                closePostModal();
+            }
+        });
+
+        window.addEventListener('load', initFeed);
+    </script>
+    <script src="assets/page-transitions.js"></script>
+</body>
+</html>

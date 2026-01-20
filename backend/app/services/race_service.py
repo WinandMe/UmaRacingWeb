@@ -1,6 +1,9 @@
 """
 RaceService - Wraps RaceEngine and exposes it as an API service
 All game mechanics are preserved from the original PySide6 app
+
+Code Authentication: URS-SERVICE-2026-WMIRQ-RACEAPI
+Created by: WinandMe (Safi), Ilfaust-Rembrandt (Quaggy)
 """
 import sys
 import os
@@ -266,7 +269,8 @@ class RaceService:
                     'gate': self.gate_numbers.get(name, 0),
                     'color': self.uma_colors.get(name, '#ffffff'),
                     'finished': True,
-                    'dnf': False
+                    'dnf': False,
+                    'status': self._get_mechanic_status(name, engine_states)
                 })
             
             # Add DNF and unfinished horses
@@ -280,7 +284,8 @@ class RaceService:
                         'gate': self.gate_numbers.get(name, 0),
                         'color': self.uma_colors.get(name, '#ffffff'),
                         'finished': False,
-                        'dnf': self.uma_dnf.get(name, {}).get('dnf', False)
+                        'dnf': self.uma_dnf.get(name, {}).get('dnf', False),
+                        'status': self._get_mechanic_status(name, engine_states)
                     })
             
             positions_list = final_positions
@@ -294,7 +299,8 @@ class RaceService:
                     'gate': self.gate_numbers.get(name, 0),
                     'color': self.uma_colors.get(name, '#ffffff'),
                     'finished': self.uma_finished.get(name, False),
-                    'dnf': self.uma_dnf.get(name, {}).get('dnf', False)
+                    'dnf': self.uma_dnf.get(name, {}).get('dnf', False),
+                    'status': self._get_mechanic_status(name, engine_states)
                 }
                 for i, (name, distance) in enumerate(frame_positions)
             ]
@@ -488,6 +494,16 @@ class RaceService:
         finished_order = sorted(self.finish_times.items(), key=lambda x: x[1])
         final_positions = [name for name, _ in finished_order]
         
+        # Add copyright watermark to achievements
+        watermarked_achievements = self.achievement_lines.copy()
+        watermarked_achievements.append("")
+        watermarked_achievements.append("─" * 60)
+        watermarked_achievements.append("Race simulated by Uma Racing Simulator")
+        watermarked_achievements.append("Created by WinandMe & Ilfaust-Rembrandt")
+        watermarked_achievements.append("Fan project for Uma Musume Pretty Derby (© Cygames)")
+        watermarked_achievements.append("Auth: URS-RESULT-2026-WMIRQ")
+        watermarked_achievements.append("─" * 60)
+        
         return RaceResult(
             finish_times=self.finish_times,
             final_positions=final_positions,
@@ -498,7 +514,7 @@ class RaceService:
                 name: self._get_position_achievement(name, i + 1)
                 for i, (name, _) in enumerate(finished_order)
             },
-            achievement_lines=self.achievement_lines
+            achievement_lines=watermarked_achievements
         )
     
     def get_participant_stats(self, uma_name: str) -> ParticipantStats:
@@ -563,6 +579,30 @@ class RaceService:
             advice_lines.append("🏆 CHAMPIONSHIP MATERIAL!")
         
         return "\n".join(advice_lines) if advice_lines else "Train well!"
+
+    def _get_mechanic_status(self, name: str, engine_states: Dict) -> list:
+        """Get list of active mechanic statuses for a horse"""
+        status = []
+        if name not in engine_states:
+            return status
+        
+        state = engine_states[name]
+        
+        if state.is_in_duel:
+            status.append('duel')
+        if state.is_rushing:
+            status.append('rushing')
+        if hasattr(state, 'is_in_temptation') and state.is_in_temptation:
+            status.append('temptation')
+        if state.is_in_spot_struggle:
+            status.append('spot_struggle')
+        
+        # Check if any skill is currently active
+        # (This would require access to active_skills tracking - adding as placeholder)
+        # if any active skills:
+        #     status.append('skill_active')
+        
+        return status
 
 # Global race service instance
 race_service = RaceService()

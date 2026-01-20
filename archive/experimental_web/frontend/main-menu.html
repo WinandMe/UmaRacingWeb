@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uma Racing Web - Main Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Background particles effect */
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+
+        /* XMB Container */
+        .xmb-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Top bar with time and user info */
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+            z-index: 100;
+        }
+
+        .clock {
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .user-name {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Horizontal menu */
+        .horizontal-menu {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-items {
+            display: flex;
+            gap: 120px;
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-right: 25%;
+        }
+
+        .menu-category {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.3;
+            transform: scale(0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .menu-category.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .menu-category.adjacent {
+            opacity: 0.6;
+            transform: scale(0.9);
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 0 30px rgba(255,255,255,0.1);
+        }
+
+        .menu-category.active .category-icon {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.8);
+            box-shadow: 0 0 50px rgba(255,255,255,0.4), 0 0 100px rgba(102, 126, 234, 0.3);
+            transform: translateY(-10px);
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .menu-category.active .category-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Vertical submenu */
+        .submenu-container {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 30px;
+            min-width: 320px;
+            max-height: 60vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 200;
+        }
+
+        .submenu-container.show {
+            opacity: 1;
+            pointer-events: all;
+            right: 3%;
+        }
+
+        .submenu-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .submenu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .submenu-item {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .submenu-item:hover,
+        .submenu-item.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.6);
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submenu-item-icon {
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .submenu-item-text {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .submenu-item-arrow {
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .submenu-item:hover .submenu-item-arrow {
+            opacity: 1;
+        }
+
+        /* Bottom hints */
+        .bottom-hints {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            display: flex;
+            gap: 30px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+            z-index: 100;
+        }
+
+        .hint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .hint-key {
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Wave effect on bottom */
+        .wave-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(180deg, transparent, rgba(102, 126, 234, 0.1));
+            z-index: 1;
+            opacity: 0.5;
+        }
+
+        /* Scrollbar styling */
+        .submenu-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .submenu-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .submenu-container::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+        }
+
+        .submenu-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.7);
+        }
+    </style>
+    <link rel="stylesheet" href="assets/page-transitions.css">
+    <link rel="stylesheet" href="assets/loading-overlay.css">
+</head>
+<body>
+    <!-- Background particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Wave background -->
+    <div class="wave-bg"></div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Top bar -->
+    <div class="top-bar">
+        <div class="clock" id="clock">--:--</div>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">👤</div>
+            <div class="user-name" id="userName">Guest</div>
+        </div>
+    </div>
+
+    <!-- XMB Container -->
+    <div class="xmb-container">
+        <div class="horizontal-menu">
+            <div class="menu-items" id="menuItems">
+                <!-- Categories will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Submenu -->
+        <div class="submenu-container" id="submenuContainer">
+            <div class="submenu-title" id="submenuTitle">Menu</div>
+            <div class="submenu-items" id="submenuItems">
+                <!-- Submenu items will be dynamically generated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom hints -->
+    <div class="bottom-hints">
+        <div class="hint">
+            <span class="hint-key">←→</span>
+            <span>Navigate Categories</span>
+        </div>
+        <div class="hint">
+            <span class="hint-key">↑↓</span>
+            <span>Select Item</span>
+        </div>
+        <div class="hint">
+            <span class="hint-key">ENTER</span>
+            <span>Confirm</span>
+        </div>
+        <div class="hint">
+            <span class="hint-key">ESC</span>
+            <span>Logout</span>
+        </div>
+    </div>
+
+    <script src="assets/api-config.js"></script>
+    <script>
+        // API_BASE is defined in api-config.js
+        let currentUser = null;
+        let currentCategoryIndex = 0;
+        let categories = [];
+
+        // Menu structure
+        const menuStructure = {
+            trainee: [
+                {
+                    id: 'network',
+                    icon: '🔗',
+                    title: 'Network',
+                    items: [
+                        { icon: '💼', text: 'UmaLinkedIn', action: () => navigate('/umalinkedin.html') },
+                        { icon: '', text: 'Umaddit', action: () => navigate('/umaddit.html') },
+                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/messages.html') },
+                        { icon: '👥', text: 'Friends', action: () => navigate('/friends.html') }
+                    ]
+                },
+                {
+                    id: 'racing',
+                    icon: '🏇',
+                    title: 'Racing',
+                    items: [
+                        { icon: '🏁', text: 'Race Events', action: () => navigate('/races.html') },
+                        { icon: '📊', text: 'My Stats', action: () => navigate('/stats.html') },
+                        { icon: '🏆', text: 'Race History', action: () => navigate('/history.html') }
+                    ]
+                },
+                {
+                    id: 'profile',
+                    icon: '👤',
+                    title: 'Profile',
+                    items: [
+                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/settings.html') },
+                        { icon: '🎨', text: 'Customize Avatar', action: () => showNotification('Coming soon!') },
+                        { icon: '📋', text: 'View Profile', action: () => navigate('/profile.html') }
+                    ]
+                },
+                {
+                    id: 'system',
+                    icon: '🔧',
+                    title: 'System',
+                    items: [
+                        { icon: '❓', text: 'Help & Guide', action: () => showNotification('Help center coming soon!') },
+                        { icon: '📰', text: 'News & Updates', action: () => showNotification('No new updates') },
+                        { icon: '🚪', text: 'Logout', action: () => logout() }
+                    ]
+                }
+            ],
+            trainer: [
+                {
+                    id: 'network',
+                    icon: '🔗',
+                    title: 'Network',
+                    items: [
+                        { icon: '💼', text: 'UmaLinkedIn', action: () => navigate('/umalinkedin.html') },
+                        { icon: '', text: 'Umaddit', action: () => navigate('/umaddit.html') },
+                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/messages.html') },
+                        { icon: '👥', text: 'Friends', action: () => navigate('/friends.html') }
+                    ]
+                },
+                {
+                    id: 'racing',
+                    icon: '🏁',
+                    title: 'Racing',
+                    items: [
+                        { icon: '📝', text: 'Register for Race', action: () => navigate('/race-registration.html') },
+                        { icon: '🏇', text: 'Live Races', action: () => navigate('/live-races.html') },
+                        { icon: '🏆', text: 'Race Results', action: () => navigate('/races.html') }
+                    ]
+                },
+                {
+                    id: 'training',
+                    icon: '📚',
+                    title: 'Training',
+                    items: [
+                        { icon: '🎯', text: 'Trainee List', action: () => navigate('/trainees.html') },
+                        { icon: '📊', text: 'Manage Stats', action: () => navigate('/stats.html') },
+                        { icon: '🏋️', text: 'Training Programs', action: () => showNotification('Coming soon!') }
+                    ]
+                },
+                {
+                    id: 'racing',
+                    icon: '🏇',
+                    title: 'Racing',
+                    items: [
+                        { icon: '🏁', text: 'Race Events', action: () => navigate('/races.html') },
+                        { icon: '📈', text: 'Performance Analytics', action: () => navigate('/analytics.html') },
+                        { icon: '🏆', text: 'Race History', action: () => navigate('/history.html') }
+                    ]
+                },
+                {
+                    id: 'profile',
+                    icon: '👤',
+                    title: 'Profile',
+                    items: [
+                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/settings.html') },
+                        { icon: '🎨', text: 'Customize Avatar', action: () => showNotification('Coming soon!') },
+                        { icon: '📋', text: 'View Profile', action: () => navigate('/profile.html') }
+                    ]
+                },
+                {
+                    id: 'system',
+                    icon: '🔧',
+                    title: 'System',
+                    items: [
+                        { icon: '❓', text: 'Help & Guide', action: () => showNotification('Help center coming soon!') },
+                        { icon: '📰', text: 'News & Updates', action: () => showNotification('No new updates') },
+                        { icon: '🚪', text: 'Logout', action: () => logout() }
+                    ]
+                }
+            ],
+            admin: [
+                {
+                    id: 'network',
+                    icon: '🔗',
+                    title: 'Network',
+                    items: [
+                        { icon: '💼', text: 'UmaLinkedIn', action: () => navigate('/umalinkedin.html') },
+                        { icon: '', text: 'Umaddit', action: () => navigate('/umaddit.html') },
+                        { icon: '💬', text: 'Direct Messages', action: () => navigate('/messages.html') },
+                        { icon: '👥', text: 'Friends', action: () => navigate('/friends.html') }
+                    ]
+                },
+                {
+                    id: 'admin',
+                    icon: '👑',
+                    title: 'Administration',
+                    items: [
+                        { icon: '🏛️', text: 'Admin Dashboard', action: () => navigate('/admin-users.html') },
+                        
+                        { icon: '👥', text: 'User Management', action: () => navigate('/admin-users.html') },
+                        { icon: '🔨', text: 'Moderation Tools', action: () => navigate('/admin-moderation.html') },
+                        { icon: '🏁', text: 'Race Management', action: () => navigate('/admin-race-management.html') },
+                        { icon: '📊', text: 'System Analytics', action: () => showNotification('Coming soon!') }
+                    ]
+                },
+                {
+                    id: 'racing',
+                    icon: '🏇',
+                    title: 'Racing',
+                    items: [
+                        { icon: '🏁', text: 'Race Events', action: () => navigate('/races.html') },
+                        { icon: '📊', text: 'All Stats', action: () => navigate('/stats.html') },
+                        { icon: '🏆', text: 'Race History', action: () => navigate('/history.html') }
+                    ]
+                },
+                {
+                    id: 'profile',
+                    icon: '👤',
+                    title: 'Profile',
+                    items: [
+                        { icon: '⚙️', text: 'User Settings', action: () => navigate('/settings.html') },
+                        { icon: '🎨', text: 'Customize Avatar', action: () => showNotification('Coming soon!') },
+                        { icon: '📋', text: 'View Profile', action: () => navigate('/profile.html') }
+                    ]
+                },
+                {
+                    id: 'system',
+                    icon: '🔧',
+                    title: 'System',
+                    items: [
+                        { icon: '⚙️', text: 'System Config', action: () => showNotification('Coming soon!') },
+                        { icon: '📰', text: 'News & Updates', action: () => showNotification('No new updates') },
+                        { icon: '🚪', text: 'Logout', action: () => logout() }
+                    ]
+                }
+            ]
+        };
+
+        // Initialize
+        async function init() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Not authenticated');
+                currentUser = await response.json();
+                
+                updateUserDisplay();
+                loadMenuForRole(currentUser.role);
+                startClock();
+                createParticles();
+                setupKeyboardNavigation();
+                
+            } catch (error) {
+                console.error('Init error:', error);
+                localStorage.removeItem('token');
+                window.location.href = '/login.html';
+            }
+        }
+
+        function updateUserDisplay() {
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
+        }
+
+        function loadMenuForRole(role) {
+            categories = menuStructure[role] || menuStructure.trainee;
+            renderCategories();
+            selectCategory(0);
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('menuItems');
+            container.innerHTML = categories.map((cat, index) => `
+                <div class="menu-category" data-index="${index}">
+                    <div class="category-icon">${cat.icon}</div>
+                    <div class="category-title">${cat.title}</div>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.menu-category').forEach(el => {
+                el.addEventListener('click', () => {
+                    selectCategory(parseInt(el.dataset.index));
+                });
+            });
+        }
+
+        function selectCategory(index) {
+            currentCategoryIndex = index;
+            const categoryElements = document.querySelectorAll('.menu-category');
+            
+            categoryElements.forEach((el, i) => {
+                el.classList.remove('active', 'adjacent');
+                if (i === index) {
+                    el.classList.add('active');
+                } else if (Math.abs(i - index) === 1) {
+                    el.classList.add('adjacent');
+                }
+            });
+
+            // Show submenu
+            showSubmenu(categories[index]);
+        }
+
+        function showSubmenu(category) {
+            const container = document.getElementById('submenuContainer');
+            const title = document.getElementById('submenuTitle');
+            const items = document.getElementById('submenuItems');
+
+            title.textContent = category.title;
+            items.innerHTML = category.items.map((item, index) => `
+                <div class="submenu-item" data-index="${index}">
+                    <div class="submenu-item-icon">${item.icon}</div>
+                    <div class="submenu-item-text">${item.text}</div>
+                    <div class="submenu-item-arrow">→</div>
+                </div>
+            `).join('');
+
+            container.classList.add('show');
+
+            // Add click handlers
+            document.querySelectorAll('.submenu-item').forEach((el, i) => {
+                el.addEventListener('click', () => {
+                    category.items[i].action();
+                });
+            });
+        }
+
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        if (currentCategoryIndex > 0) {
+                            selectCategory(currentCategoryIndex - 1);
+                        }
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        if (currentCategoryIndex < categories.length - 1) {
+                            selectCategory(currentCategoryIndex + 1);
+                        }
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        if (confirm('Are you sure you want to logout?')) {
+                            logout();
+                        }
+                        break;
+                }
+            });
+        }
+
+        function navigate(path) {
+            // Smooth fade-out transition to next page
+            if (typeof navigateTo === 'function') {
+                navigateTo(path);
+            } else {
+                window.location.href = path;
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(102, 126, 234, 0.9);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                z-index: 10000;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        function startClock() {
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                document.getElementById('clock').textContent = `${hours}:${minutes}`;
+            }
+            updateClock();
+            setInterval(updateClock, 60000);
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+    <script src="assets/loading-overlay.js"></script>
+    <script src="assets/page-transitions.js"></script>
+</body>
+</html>

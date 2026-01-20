@@ -1,237 +1,378 @@
-﻿#  UmaRacingWeb
+# 🏇 UmaRacingWeb
 
-A modern web-based **persistent multiplayer racing simulator** for Uma Musume Pretty Derby with user authentication, stat management, racing, and social features.
+**Created by WinandMe (Safi) & Ilfaust-Rembrandt (Quaggy) | Fan Project for Uma Musume Pretty Derby**  
+**Uma Musume © Cygames - This is a non-commercial fan-made simulator**
 
-##  Features
+**Official Repository:** [https://github.com/WinandMe/UmaRacingWeb](https://github.com/WinandMe/UmaRacingWeb)
+
+A modern web-based **real-time racing simulator** for Uma Musume Pretty Derby featuring accurate race mechanics, photo finish detection, and WebSocket-powered live race updates with React frontend.
+
+---
+
+## 💝 About This Project
+
+**This is a fan-made project created with love for Uma Musume Pretty Derby.**  
+We respect Cygames' intellectual property and created this as a **non-commercial tribute** to the game.
+
+### Please Respect Our Work
+
+We've spent countless hours implementing accurate race mechanics and building this system.  
+If you're inspired by our work:
+
+✅ **DO:**
+- Give credit to WinandMe & Ilfaust-Rembrandt if you reference our implementation
+- Link back to this repository if you discuss our work
+- Reach out if you want to collaborate or learn from our code
+- Respect the Uma Musume community and Cygames' IP
+
+❌ **PLEASE DON'T:**
+- Copy our code and claim you wrote it yourself
+- Remove our credits and authentication markers
+- Use this commercially without Cygames' permission
+- Distribute modified versions without giving us credit
+
+**Project Fingerprint:** `URS-PROJECT-2026-WMIRQ-MASTER`  
+*This codebase contains embedded signatures to help identify our implementation if someone copies it without credit.*
+
+---
+
+## 🎮 Features
 
 ### Core Racing System
-- ** Real-time Race Simulation**: Watch races unfold with WebSocket-powered updates
-- ** Complete Race Database**: 169+ races across G1, G2, G3, and International categories
-- ** Race Analytics**: Detailed results, participant stats, and performance tracking
+- **⚡ Real-time Race Simulation**: Tick-based (0.05s) physics simulation with WebSocket-powered live updates
+- **🏁 Photo Finish Detection**: Hybrid system with weighted tiebreaker (60% Velocity, 20% Accel, 20% Power) + manual override
+- **📊 Complete Race Database**: 169+ races across G1, G2, G3, and International categories
+- **🎯 Uma Musume Mechanics**: 
+  - Distance/Surface aptitude acceleration
+  - Running style strategies (逃げ/先行/差し/追込)
+  - Complex skill activation system with 240+ skills
+  - Spurt/last spurt phase mechanics
+  - Stamina management and position blocking
 
-### User & Stat Management
-- ** User Roles**: Trainee (submit stats), Trainer (manage trainees), Admin (system control)
-- ** Input-Only Stat System**: Stats are immutable spreadsheet-driven inputs (no grinding/decay)
-- ** Validation**: Automatic stat validation with optional admin override
-- ** Audit Trail**: Complete history of all stat submissions and admin actions
+### Code Protection & Verification
+- **🔐 Ultra-Strict Verification**: Multi-signature authentication system (11 signatures across 3 critical files)
+- **✅ Startup Verification**: App checks code integrity on launch - blocks if signatures missing
+- **⚠️ Theft Detection**: Embedded authentication hashes (URS-2026-WMIRQ) to identify unauthorized copies
+- **📋 Disclaimer Screen**: Legal notice about Cygames IP ownership and fan project status
 
-### Social Features
-- ** Public Chat**: Real-time messaging with admin moderation
-- ** Friends System**: Send/accept friend requests with blocking capability
-- ** Direct Messages**: Private conversations with admin oversight
-- ** Moderation**: Chat deletion, user banning, and content review
+## 🚀 Quick Start (5 Minutes)
 
-### Admin Tools
-- ** User Management**: Ban/unban users with audit logging
-- ** Stat Overrides**: Override any stat for special cases
-- ** Audit Log**: Full visibility into all system actions
-- ** Content Review**: View conversations and user activity
+### Prerequisites
+- Python 3.8+ (Python 3.11 or 3.12 recommended for best compatibility)
+- Node.js 14+
+- Git
+- **Windows users**: May need [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) if installation fails
 
-##  Quick Start (5 Minutes)
+### Quick Setup (Windows)
 
-### 1. Install Dependencies
+**For Windows users**, we provide automated setup scripts:
+
+#### First Time Setup
+```bash
+# Clone repository
+git clone https://github.com/WinandMe/UmaRacingWeb.git
+cd UmaRacingWeb
+
+# Run first-time initialization (installs all dependencies)
+first_init.bat
+```
+
+This will:
+1. Check Python installation
+2. Install backend dependencies (pip install)
+3. Check Node.js installation
+4. Install frontend dependencies (npm install)
+
+**Note:** If installation fails with Rust/pydantic-core error, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
+
+#### Running the Application
+```bash
+# Start both backend and frontend
+start.bat
+```
+
+This will:
+- Start backend server on port 5000 (current window)
+- Open new window and start frontend on port 3000
+- Display access URLs
+
+### Manual Setup (All Platforms)
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/WinandMe/UmaRacingWeb.git
+cd UmaRacingWeb
+```
+
+### 2. Setup Backend
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
-### 2. Start Backend Server
+**Required packages:**
+- fastapi
+- uvicorn[standard]
+- pydantic
+
+### 3. Start Backend Server
 ```bash
 python main.py
+# OR
+uvicorn main:app --reload --port 5000
 ```
 
 Expected output:
 ```
-============================================================
- Uma Racing Web - Starting Backend Server
-============================================================
+======================================================================
+  Uma Racing Simulator - Backend Server
+  Created by WinandMe & Ilfaust-Rembrandt
+  Fan project for Uma Musume Pretty Derby (© Cygames)
+  Authentication: URS-API-2026-WMIRQ-BACKEND
+  Please respect our work and give credit if you use it! 💙
+======================================================================
 
- API Server:     http://localhost:8000
- API Docs:       http://localhost:8000/docs
- Frontend:       http://localhost:5500 (if using Live Server)
-
-============================================================
- Database initialized successfully
-INFO:     Uvicorn running on http://0.0.0.0:8000
+INFO:     Uvicorn running on http://0.0.0.0:5000
 ```
 
-### 3. Start Frontend (New Terminal)
-**Option A: Using VS Code Live Server (Recommended)**
-- Right-click `frontend/register.html`  "Open with Live Server"
-
-**Option B: Python HTTP Server**
+### 4. Setup Frontend (New Terminal)
 ```bash
 cd frontend
-python -m http.server 5500
+npm install
+npm start
 ```
 
-### 4. Access Application
+Frontend will start on `http://localhost:3000`
+
+### 5. Access Application
+
 | Component | URL |
 |-----------|-----|
-| **Frontend** | http://localhost:5500 |
-| **API Server** | http://localhost:8000 |
-| **API Docs** | http://localhost:8000/docs |
+| **Frontend** | http://localhost:3000 |
+| **Backend API** | http://localhost:5000 |
+| **API Docs** | http://localhost:5000/docs |
 
-### Demo Credentials
-```
-Trainee: trainee_demo / password123
-Trainer: trainer_demo / password123
-Admin:   admin / admin123
-```
+**First Launch:**
+1. Verification screen (checks code authenticity - 1.5s)
+2. Disclaimer screen (acknowledge Cygames IP ownership)
+3. Main menu (load race configuration)
+4. Race execution (watch live simulation)
 
-** [See Full Startup Guide](STARTUP.md) for detailed instructions**
+## 🔧 How It Works
 
-##  How It Works
+### Race Simulation Flow
+1. **Load Race Config** - Choose from 169+ official races or create custom configuration
+2. **Setup Participants** - Configure Uma Musume with stats (Speed, Stamina, Power, Guts, Wit) and skills
+3. **Start Race** - Live WebSocket stream updates every 0.05s tick
+4. **Watch Live** - Real-time position updates, speed changes, skill activations
+5. **Photo Finish** - Automatic detection for ties (<0.001s difference) with weighted tiebreaker
+6. **Results** - Detailed analysis with final times, max speeds, positions throughout race
 
-### For Trainees
-1. Register as Trainee
-2. View your Uma Musume details
-3. Submit stats (Speed, Stamina, Power, Guts, Wit: 0-9999 each)
-4. Stats are locked once submitted (no re-grinding)
-5. Enter races with locked stats
-6. Chat and make friends
+### Race Mechanics
+- **Tick-based Physics**: 0.05s intervals simulating speed, acceleration, stamina consumption
+- **Running Styles**: 
+  - 逃げ (Nige/Runner): Leads from start
+  - 先行 (Senko/Leader): Stays near front
+  - 差し (Sashi/Betweener): Mid-pack, closes late
+  - 追込 (Oikomi/Chaser): Back, explosive finish
+- **Skill System**: 240+ skills with conditional activation (position, phase, stamina, distance)
+- **Aptitude Bonuses**: Distance/Surface aptitudes affect acceleration
+- **Phase Transitions**: Start → Mid-race → Spurt (last 1/3) → Last Spurt (final 1/6)
+- **Stamina Management**: Running out causes massive speed penalty
 
-### For Trainers
-1. Register as Trainer  
-2. Own and manage trainees (Uma Musume)
-3. Submit stats on behalf of trainees
-4. Enter trainees in races
-5. View submission history and audit trail
-
-### For Admins
-1. User management (ban/unban)
-2. Override stats for special cases
-3. Moderate chat and DMs
-4. View complete audit logs
-5. System configuration
-
-##  Tech Stack
+## 🛠️ Tech Stack
 
 ### Backend
-- **FastAPI** - REST API framework
-- **SQLAlchemy** - ORM for database operations
-- **SQLite** - Development database (PostgreSQL ready)
-- **JWT** - Secure token authentication
-- **Bcrypt** - Password hashing
-- **Uvicorn** - ASGI application server
+- **FastAPI** - Modern async REST API framework
+- **Uvicorn** - Lightning-fast ASGI server
+- **Pydantic** - Data validation with type hints
+- **WebSocket** - Real-time race updates
+- **Python 3.8+** - Core simulation engine
 
 ### Frontend
-- **HTML5/CSS3** - Modern responsive design
-- **JavaScript (ES6+)** - Dynamic interactions
-- **localStorage** - Token persistence
-- **Fetch API** - API communication
+- **React 18** - Component-based UI framework
+- **Framer Motion** - Smooth animations
+- **Axios** - HTTP client for API calls
+- **TailwindCSS** - Utility-first styling
+- **WebSocket API** - Real-time race streaming
 
-##  Project Structure
+### Race Engine
+- **race_engine.py** (4734 lines) - Core simulation logic
+- **skills.py** - 240+ Uma Musume skills database
+- **races.py** - 169+ official race data (G1/G2/G3/International)
+
+## 📁 Project Structure
 
 ```
 UmaRacingWeb/
- backend/
-    main.py                      # FastAPI entry point
-    requirements.txt             # Dependencies
-    app/
-       db.py                   # Database setup
-       models/
-          database.py         # SQLAlchemy models
-          user.py             # Auth models
-          race.py             # Racing models
-       services/
-          auth_service.py    # JWT & password
-          stat_validator.py  # Stat validation
-          race_service.py     # Race engine
-       routes/
-           auth.py             # Authentication
-           stats.py            # Stats
-           races.py            # Races
-           chat.py             # Chat
-           friends.py          # Friends
-           dms.py              # Messaging
-           admin.py            # Admin
-    races.py                    # Race database
-    skills.py                   # Skills database
-
- frontend/
-    register.html               # Registration
-    login.html                  # Login
-    dashboard.html              # Main dashboard
-    admin-dashboard.html        # Admin panel
-
- docs/
-    STAT_SYSTEM.md             # Stat system design
-    DATABASE_SCHEMA.md         # Database schema
-
- STARTUP.md                      # Setup guide
- README.md
+├── backend/
+│   ├── main.py                           # FastAPI server with WebSocket
+│   ├── race_engine.py                    # Core simulation (4734 lines)
+│   ├── skills.py                         # Skills database (240+ skills)
+│   ├── verify_integrity.py               # Code authentication checker
+│   ├── requirements.txt                  # Python dependencies
+│   └── app/
+│       ├── models/
+│       │   └── race.py                  # Pydantic models
+│       ├── services/
+│       │   └── race_service.py          # Race engine wrapper
+│       └── races.py                     # Race database (169+ races)
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.js                       # Main React app with 4-phase flow
+│   │   ├── components/
+│   │   │   ├── VerificationScreen.js   # Code integrity check (startup)
+│   │   │   ├── DisclaimerScreen.js     # Cygames IP disclaimer
+│   │   │   ├── ConfigLoader.js         # Race config loader (main menu)
+│   │   │   ├── RaceContainer.js        # Race execution & display
+│   │   │   ├── ConfigGenerator.js      # Create custom races
+│   │   │   └── ParticipantDetails.js   # Uma details viewer
+│   │   └── index.js                     # React entry point
+│   ├── public/
+│   ├── package.json                     # npm dependencies
+│   └── tailwind.config.js               # Tailwind styling
+│
+├── ignored/                              # Development/testing files (not in repo)
+│   ├── check_integrity.py               # Signature validation script
+│   ├── test_stolen_code_detection.py    # Theft detection tester
+│   ├── test_theft_scenario.py           # Theft simulation
+│   ├── CODE_OWNERSHIP_VERIFICATION.md   # Protection system docs
+│   ├── SECURITY.md                      # Community guidelines
+│   ├── DMCA_TAKEDOWN_TEMPLATE.md        # Credit dispute template
+│   └── TEST_RESULTS_SUMMARY.md          # Test results
+│
+├── first_init.bat                        # Windows: First-time setup script
+├── start.bat                             # Windows: Start application script
+├── .gitignore                            # Git ignore rules
+├── LICENSE
+└── README.md
 ```
 
-##  API Endpoints
+## 📡 API Endpoints
 
-### Authentication (`/api/auth`)
-- `POST /register` - Create account
-- `POST /login` - Login with JWT
-- `GET /me` - Current user info
+### Verification (`/api`)
+- `GET /verify-integrity` - Check authentication signatures (11 signatures)
 
-### Stats (`/api/stats`)
-- `POST /submit` - Submit stats
-- `GET /{trainee_id}` - Latest stats
-- `GET /{trainee_id}/history` - History
+### Race Management (`/api/race`)
+- `POST /load-config` - Upload race JSON configuration
+- `GET /config` - Get current race configuration
+- `POST /start` - Start race simulation
+- `POST /stop` - Stop race
+- `POST /set-speed` - Set simulation speed (1x, 2x, 5x, 10x)
+- `GET /participant/{umaName}` - Get Uma Musume details
 
-### Races (`/api/races`)
-- `POST /create` - Create race
-- `GET /` - List races
-- `POST /{race_id}/enter` - Enter race
+### Race Data (`/api`)
+- `GET /race-categories` - List categories (G1, G2, G3, International)
+- `GET /races/{category}` - Get races by category
+- `GET /skills` - Get all 240+ skills
 
-### Social
-- `POST /friends/request` - Friend request
-- `GET /friends/list` - Friends list
-- `POST /chat/send` - Public chat
-- `POST /dms/send` - DM
+### WebSocket
+- `WS /ws/race/{clientId}` - Real-time race updates stream
+  - Sends race frame every 0.05s tick
+  - Position, speed, stamina, skill activations
+  - Race finish event with results
 
-### Admin (`/api/admin`)
-- `POST /users/ban` - Ban user
-- `POST /stats/override` - Override stat
-- `GET /audit-log` - Audit log
+## 🎯 Key Design Principles
 
-##  Key Design Principles
+- **Accurate Simulation**: Faithful recreation of Uma Musume race mechanics
+- **Real-time Updates**: WebSocket streams 20 ticks/second for smooth visualization
+- **Photo Finish Precision**: Hybrid automatic + manual system for ultra-close races
+- **Code Protection**: Multi-layer authentication system prevents unauthorized copying
+- **Fan Project Ethics**: Respects Cygames IP, requires disclaimer acknowledgment
+- **Open Architecture**: Modular design for easy extension and modification
 
-- **No Training/Grinding**: Stats are input-only, no progression decay
-- **Immutable Snapshots**: Race stats frozen at entry time
-- **Full Audit Trail**: Every action logged for transparency
-- **Role-Based Access**: Strict permissions per user role
-- **Spreadsheet Integration**: Stats validated against external rules
+## [TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Installation issues and common problems
+- **📚 Documentation
 
-##  Documentation
+- **API Docs**: http://localhost:5000/docs (Swagger UI - interactive API documentation)
 
-- **[STARTUP.md](STARTUP.md)** - Complete setup guide
-- **[STAT_SYSTEM.md](docs/STAT_SYSTEM.md)** - Stat system design
-- **[DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md)** - Database schema
-- **API Docs**: http://localhost:8000/docs (Swagger UI)
+### Development & Testing Files
 
-##  Deployment
+The following files are available in the `ignored/` folder for development/testing purposes (not tracked in git):
 
-Create `.env` in `backend/`:
+- **check_integrity.py** - Validates all 11 authentication signatures across codebase
+- **test_stolen_code_detection.py** - Scans for hidden authentication markers
+- **test_theft_scenario.py** - Simulates code theft detection scenarios
+- **CODE_OWNERSHIP_VERIFICATION.md** - Detailed 11-layer protection system documentation
+- **SECURITY.md** - Community guidelines & credit policy
+- **DMCA_TAKEDOWN_TEMPLATE.md** - Template for credit dispute resolution
+- **TEST_RESULTS_SUMMARY.md** - Comprehensive theft detection test results
+
+These files contain sensitive information about the protection system and are excluded from the public repository.
+
+## 🚀 Deployment
+
+### Backend Configuration
+Default port: `5000`  
+To change, edit `main.py` line 382:
+```python
+uvicorn.run(app, host="0.0.0.0", port=5000)
 ```
-DATABASE_URL=sqlite:///uma_racing.db
-JWT_SECRET=your-secret-key
-JWT_ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
+
+### Frontend Configuration
+Update API endpoints if backend port changes:
+- `src/components/VerificationScreen.js`
+- `src/components/RaceContainer.js`
+- `src/components/ConfigLoader.js`
+- `src/components/ConfigGenerator.js`
+
+### CORS Settings
+Backend allows these origins (main.py line 50-52):
+```python
+allow_origins=["http://localhost:3000", "http://localhost:5173"]
 ```
 
-For production:
-- Use PostgreSQL database
-- Generate secure JWT secret
-- Set specific CORS domains
+### Production
+- Use production-grade ASGI server (Gunicorn + Uvicorn workers)
 - Enable HTTPS
-- Use production ASGI server
+- Set specific CORS domains
+- Consider caching for race database endpoints
+- Monitor WebSocket connection limits
 
-##  License
+## 🛡️ Code Protection & Security
+
+This project includes **ultra-strict verification** with 11 embedded authentication signatures:
+
+**For Developers:**
+
+Testing and validation tools are available locally in the `ignored/` folder:
+```bash
+# Run these commands from the project root (if you have the ignored/ folder)
+python ignored/check_integrity.py              # Check all 11 signatures
+python ignored/test_stolen_code_detection.py   # Scan for hidden markers
+python ignored/test_theft_scenario.py          # Simulate theft detection
+```
+
+**Manually Trigger Error:**
+Comment out any signature (e.g., line 86 in race_engine.py) → restart backend → red warning screen appears
+
+**Test Protection:**
+```bash
+python check_integrity.py           # Check all 11 signatures
+python test_stolen_code_detection.py # Scan for hidden markers
+python test_theft_scenario.py       # Simulate theft detection
+```
+
+**Manually Trigger Error:**
+Comment out any signature (e.g., line 86 in race_engine.py) → restart → red warning screen
+
+## 📄 License
 
 All rights reserved - see [LICENSE](LICENSE)
 
-##  Acknowledgments
+**This is a fan-made project for Uma Musume Pretty Derby (© Cygames).**  
+Not affiliated with or endorsed by Cygames.
 
-- Uma Musume Pretty Derby by Cygames
-- Original UmaRacingProject
+## 🙏 Acknowledgments
+
+- **Uma Musume Pretty Derby** by Cygames - Original game and characters
+- **Game8.jp / GameTora** - Race data and mechanics research
+- **r/UmamusumeFFS** - Community support
+- **Uma Musume fans worldwide** - For keeping the spirit alive ❤️
 
 ---
 
-Made with  for Uma Musume fans
+**Made with ❤️ for Uma Musume fans**  
+**Created by WinandMe (Safi) & Ilfaust-Rembrandt (Quaggy)**  
+**Repository:** https://github.com/WinandMe/UmaRacingWeb

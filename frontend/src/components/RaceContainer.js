@@ -8,6 +8,8 @@ import LiveStandings from './LiveStandings';
 import ParticipantStats from './ParticipantStats';
 import ConfigGenerator from './ConfigGenerator';
 
+// Ownership Hash: URS-RACECONTAINER-2026-WMIRQ | Authors: WinandMe, Ilfaust-Rembrandt
+
 const RaceContainer = ({ configFile }) => {
   const [raceState, setRaceState] = useState('idle'); // idle, running, finished, result, replay
   const [postRaceState, setPostRaceState] = useState(null); // showing-finished, countdown, fading-out
@@ -28,7 +30,7 @@ const RaceContainer = ({ configFile }) => {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/race/config`);
+        const response = await axios.get(`http://localhost:5000/api/race/config`);
         console.log('📋 Config loaded:', response.data);
         setConfigData(response.data);
       } catch (err) {
@@ -41,7 +43,7 @@ const RaceContainer = ({ configFile }) => {
   const startRace = async () => {
     try {
       console.log('🎬 Starting race...');
-      const response = await axios.post('http://localhost:8000/api/race/start');
+      const response = await axios.post('http://localhost:5000/api/race/start');
       console.log('✅ Race started:', response.data);
       setRaceState('running');
       connectWebSocket();
@@ -53,7 +55,7 @@ const RaceContainer = ({ configFile }) => {
 
   const stopRace = async () => {
     try {
-      await axios.post('http://localhost:8000/api/race/stop');
+      await axios.post('http://localhost:5000/api/race/stop');
       setRaceState('idle');
       if (wsRef.current) wsRef.current.close();
     } catch (err) {
@@ -63,7 +65,7 @@ const RaceContainer = ({ configFile }) => {
 
   const connectWebSocket = () => {
     const clientId = `client-${Date.now()}`;
-    const wsUrl = `ws://localhost:8000/ws/race/${clientId}`;
+    const wsUrl = `ws://localhost:5000/ws/race/${clientId}`;
     console.log('Connecting to WebSocket:', wsUrl);
     
     wsRef.current = new WebSocket(wsUrl);
@@ -277,7 +279,7 @@ const RaceContainer = ({ configFile }) => {
               onChange={(e) => {
                 const newSpeed = parseFloat(e.target.value);
                 setSpeedMultiplier(newSpeed);
-                axios.post(`http://localhost:8000/api/race/set-speed?speed_multiplier=${newSpeed}`)
+                axios.post(`http://localhost:5000/api/race/set-speed?speed_multiplier=${newSpeed}`)
                   .catch(err => console.error('Failed to set speed:', err));
               }}
               className="px-4 py-2 bg-darker text-white rounded-lg text-sm"
@@ -414,60 +416,76 @@ const RaceContainer = ({ configFile }) => {
           <FinalResults key="results" raceData={raceData} configData={configData} onReturnHome={() => { setRaceState('idle'); setPostRaceState(null); setCountdownSeconds(60); setRaceFrames([]); }} />
         ) : raceState === 'replay' ? (
           // Replay playback
-          <div key="race-replay" className="flex-1 flex flex-col min-h-0 gap-4 max-w-screen-2xl w-full mx-auto px-4">
-            {/* Top Row: Track with Live Standings on the right */}
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-9">
+          <div key="race-replay" className="flex-1 flex flex-col min-h-0 gap-3 w-full">
+            {/* Top Row: Track and Standings - always visible for consistent layout */}
+            <div className="flex-1 grid grid-cols-3 gap-3 min-h-0">
+              {/* Left: Track - takes 2/3 of width */}
+              <div className="col-span-2 min-h-0 flex flex-col">
                 <RaceTrack raceData={raceData} courseName={replayData?.config?.race?.racecourse || 'Nakayama'} totalDistance={replayData?.config?.race?.distance || 2000} />
               </div>
-              <div className="col-span-3 min-h-0">
-                <LiveStandings
-                  positions={raceData?.positions}
-                  onSelectHorse={(horse) => setSelectedHorse(horse)}
-                />
+              
+              {/* Right: Live Standings - takes 1/3 of width - always visible */}
+              <div className="col-span-1 min-h-0 flex flex-col">
+                {raceData?.positions ? (
+                  <LiveStandings
+                    positions={raceData?.positions}
+                    onSelectHorse={(horse) => setSelectedHorse(horse)}
+                  />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center bg-darker bg-opacity-80 rounded-lg border-2 border-secondary border-opacity-30 text-gray-400">
+                    <p className="text-center">Loading replay...</p>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Commentary and Race Events Row: aligned with track (9 cols) */}
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-9 h-64 overflow-hidden">
-                <LiveCommentary raceData={raceData} positions={raceData?.positions} />
-              </div>
+            {/* Bottom Row: Commentary and Race Events stacked (same width as track) */}
+            <div className="grid grid-cols-3 gap-3 h-64">
+              <div className="col-span-2 flex flex-col gap-3 min-h-0">
+                {/* Commentary */}
+                <div className="flex-1 min-h-0 overflow-hidden">
+                  <LiveCommentary raceData={raceData} positions={raceData?.positions} />
+                </div>
 
-              <div className="col-span-9 h-64 overflow-hidden">
-                <div className="h-full flex flex-col bg-darker bg-opacity-80 rounded-lg p-4 border-2 border-secondary border-opacity-30">
-                  <h3 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">📜 Race Events</h3>
-                  <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-                    {raceData?.positions && (
-                      <div className="space-y-2 text-xs text-gray-400">
-                        {raceData.positions.slice(0, 6).map((horse, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="p-2 bg-black bg-opacity-30 rounded border-l-2 border-primary"
-                          >
-                            <p>
-                              <span style={{ color: horse.color }}>#{horse.position} {horse.name}</span>
-                              <span className="ml-2">{horse.distance.toFixed(0)}m</span>
-                            </p>
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
+                {/* Race Events - below Commentary */}
+                <div className="flex-1 min-h-0 overflow-hidden">
+                  <div className="h-full flex flex-col bg-darker bg-opacity-80 rounded-lg p-4 border-2 border-secondary border-opacity-30">
+                    <h3 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">📜 Race Events</h3>
+                    <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                      {raceData?.positions && (
+                        <div className="space-y-2 text-xs text-gray-400">
+                          {raceData.positions.slice(0, 6).map((horse, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="p-2 bg-black bg-opacity-30 rounded border-l-2 border-primary"
+                            >
+                              <p>
+                                <span style={{ color: horse.color }}>#{horse.position} {horse.name}</span>
+                                <span className="ml-2">{horse.distance.toFixed(0)}m</span>
+                              </p>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div key="race-live" className="flex-1 flex flex-col min-h-0 gap-4 max-w-screen-2xl w-full mx-auto px-4">
-            {/* Top Row: Track with Live Standings on the right */}
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-9">
+          <div key="race-live" className="flex-1 flex flex-col min-h-0 gap-3 w-full">
+            {/* Top Row: Track and Standings - fixed height ratio */}
+            <div className="grid grid-cols-3 gap-3 flex-1 min-h-0" style={{ minHeight: '400px' }}>
+              {/* Left: Track - takes 2/3 of width */}
+              <div className="col-span-2 min-h-0 h-full flex flex-col">
                 <RaceTrack raceData={raceData} courseName={configData?.race?.racecourse || 'Nakayama'} totalDistance={configData?.race?.distance || 2000} />
               </div>
-              <div className="col-span-3 min-h-0">
+              
+              {/* Right: Live Standings - takes 1/3 of width - fixed column width */}
+              <div className="col-span-1 min-h-0 h-full overflow-hidden">
                 <LiveStandings
                   positions={raceData?.positions}
                   onSelectHorse={(horse) => setSelectedHorse(horse)}
@@ -475,33 +493,37 @@ const RaceContainer = ({ configFile }) => {
               </div>
             </div>
 
-            {/* Commentary and Race Events Row: aligned with track (9 cols) */}
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-9 h-64 overflow-hidden">
-                <LiveCommentary raceData={raceData} positions={raceData?.positions} />
-              </div>
+            {/* Bottom Row: Commentary and Race Events stacked - same 2/3 width as track */}
+            <div className="grid grid-cols-3 gap-3" style={{ height: '200px' }}>
+              <div className="col-span-2 flex flex-col gap-3 min-h-0">
+                {/* Commentary */}
+                <div style={{ height: '50%' }} className="min-h-0 overflow-hidden">
+                  <LiveCommentary raceData={raceData} positions={raceData?.positions} />
+                </div>
 
-              <div className="col-span-9 h-64 overflow-hidden">
-                <div className="h-full flex flex-col bg-darker bg-opacity-80 rounded-lg p-4 border-2 border-secondary border-opacity-30">
-                  <h3 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">📜 Race Events</h3>
-                  <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-                    {raceData?.positions && (
-                      <div className="space-y-2 text-xs text-gray-400">
-                        {raceData.positions.slice(0, 6).map((horse, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="p-2 bg-black bg-opacity-30 rounded border-l-2 border-primary"
-                          >
-                            <p>
-                              <span style={{ color: horse.color }}>#{horse.position} {horse.name}</span>
-                              <span className="ml-2">{horse.distance.toFixed(0)}m</span>
-                            </p>
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
+                {/* Race Events */}
+                <div style={{ height: '50%' }} className="min-h-0 overflow-hidden">
+                  <div className="h-full flex flex-col bg-darker bg-opacity-80 rounded-lg p-4 border-2 border-secondary border-opacity-30">
+                    <h3 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">📜 Race Events</h3>
+                    <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                      {raceData?.positions && (
+                        <div className="space-y-2 text-xs text-gray-400">
+                          {raceData.positions.slice(0, 6).map((horse, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="p-2 bg-black bg-opacity-30 rounded border-l-2 border-primary"
+                            >
+                              <p>
+                                <span style={{ color: horse.color }}>#{horse.position} {horse.name}</span>
+                                <span className="ml-2">{horse.distance.toFixed(0)}m</span>
+                              </p>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -528,7 +550,7 @@ const RaceContainer = ({ configFile }) => {
           onConfigCreated={() => {
             setShowConfigGenerator(false);
             // Reload config
-            axios.get('http://localhost:8000/api/race/config')
+            axios.get('http://localhost:5000/api/race/config')
               .then(res => setConfigData(res.data))
               .catch(err => console.error('Failed to reload config:', err));
           }}

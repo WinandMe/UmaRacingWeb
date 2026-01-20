@@ -41,15 +41,15 @@ const ConfigGenerator = ({ onClose, onConfigCreated }) => {
     const fetchData = async () => {
       try {
         const [categoriesRes, skillsRes] = await Promise.all([
-          axios.get('http://localhost:8000/api/race-categories'),
-          axios.get('http://localhost:8000/api/skills')
+          axios.get('http://localhost:5000/api/race-categories'),
+          axios.get('http://localhost:5000/api/skills')
         ]);
         
         setRaceCategories(categoriesRes.data.categories || {});
         setSkills(skillsRes.data.skills || []);
         
         // Fetch G1 races by default
-        const g1Res = await axios.get('http://localhost:8000/api/races/G1');
+        const g1Res = await axios.get('http://localhost:5000/api/races/G1');
         const racesData = g1Res.data.races || [];
         setAllRaces(racesData);
         setRaces(racesData);
@@ -69,7 +69,7 @@ const ConfigGenerator = ({ onClose, onConfigCreated }) => {
     setRaceCategory(newCategory);
     setSelectedRacecourse('');
     try {
-      const res = await axios.get(`http://localhost:8000/api/races/${newCategory}`);
+      const res = await axios.get(`http://localhost:5000/api/races/${newCategory}`);
       setAllRaces(res.data.races || []);
       setRaces(res.data.races || []);
     } catch (err) {
@@ -171,7 +171,7 @@ const ConfigGenerator = ({ onClose, onConfigCreated }) => {
       const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
       formData.append('file', blob, `${raceName.replace(/\s+/g, '_')}.json`);
 
-      await axios.post('http://localhost:8000/api/race/load-config', formData, {
+      await axios.post('http://localhost:5000/api/race/load-config', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

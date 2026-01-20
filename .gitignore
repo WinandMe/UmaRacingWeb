@@ -23,3 +23,6 @@ Thumbs.db
 
 # unneeded modules files
 node_modules/
+
+# ignored folder
+ignored/

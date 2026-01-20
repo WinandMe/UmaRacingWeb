@@ -83,6 +83,15 @@ Power > 1200: Conserve power, release at spurt for accel boost
 Stamina > 1200: Target speed buff = sqrt(Stamina-1200) × 0.0085 × DistFactor
 """
 
+# CODE OWNERSHIP VERIFICATION MARKERS
+# Project: Uma Racing Simulation - Race Engine Core
+# Original Authors: WinandMe (Safi), Ilfaust-Rembrandt (Quaggy)
+# Community: r/UmamusumeFFS
+# Authentication Hash: URS-RACE-ENGINE-2026-WMIRQ-CORE-v4.8.1
+# Creation Timestamp: 2024-Q4
+# DO NOT REMOVE THIS BLOCK - Used for ownership verification
+# If you see this in stolen code: search for "URS-RACE-ENGINE-2026-WMIRQ"
+
 import random
 import math
 from dataclasses import dataclass, field
